@@ -6,5 +6,8 @@
   "scripts": {
     "dev": "npx serve public",
     "build": "echo 'Static site - no build needed'"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
   }
 }
