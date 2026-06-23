@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dispatcher Pro — Online Logistics Request Form</title>
+<meta name="description" content="Dispatcher Pro: Enterprise logistics request data entry form. Submit and sync logistics requests directly to Google Sheets."/>
+<meta name="theme-color" content="#00488d"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>"/>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "on-secondary-fixed": "#071e27",
+        "on-error-container": "#93000a",
+        "error": "#ba1a1a",
+        "tertiary-fixed-dim": "#c6c6c7",
+        "tertiary-container": "#5f6060",
+        "surface-container-low": "#f6f3f2",
+        "secondary": "#4c616c",
+        "on-primary": "#ffffff",
+        "on-primary-fixed-variant": "#00468b",
+        "outline-variant": "#c2c6d4",
+        "outline": "#727783",
+        "primary-fixed-dim": "#a8c8ff",
+        "on-secondary-fixed-variant": "#354a53",
+        "inverse-primary": "#a8c8ff",
+        "on-primary-fixed": "#001b3d",
+        "primary-fixed": "#d6e3ff",
+        "surface-container": "#f0eded",
+        "on-surface": "#1b1b1b",
+        "inverse-on-surface": "#f3f0ef",
+        "inverse-surface": "#313030",
+        "on-secondary": "#ffffff",
+        "on-tertiary-container": "#dbdbdb",
+        "on-tertiary-fixed": "#1a1c1c",
+        "primary-container": "#005fb8",
+        "secondary-container": "#cfe6f2",
+        "secondary-fixed-dim": "#b4cad6",
+        "on-tertiary-fixed-variant": "#454747",
+        "tertiary": "#474849",
+        "surface-variant": "#e5e2e1",
+        "on-primary-container": "#cadcff",
+        "tertiary-fixed": "#e2e2e2",
+        "on-background": "#1b1b1b",
+        "surface-bright": "#fcf9f8",
+        "background": "#fcf9f8",
+        "surface-container-high": "#eae7e7",
+        "surface-dim": "#dcd9d9",
+        "surface-tint": "#005db5",
+        "surface": "#fcf9f8",
+        "on-error": "#ffffff",
+        "error-container": "#ffdad6",
+        "secondary-fixed": "#cfe6f2",
+        "on-tertiary": "#ffffff",
+        "on-secondary-container": "#526772",
+        "primary": "#00488d",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-highest": "#e5e2e1",
+        "on-surface-variant": "#424752"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      "spacing": {
+        "md": "16px",
+        "sm": "8px",
+        "unit": "4px",
+        "xs": "4px",
+        "gutter": "12px",
+        "form-gap": "20px",
+        "xl": "32px",
+        "lg": "24px"
+      },
+      "fontFamily": {
+        "headline-md": ["Inter"],
+        "body-md": ["Inter"],
+        "button-text": ["Inter"],
+        "headline-lg": ["Inter"],
+        "label-caps": ["Inter"],
+        "input-text": ["Inter"]
+      },
+      "fontSize": {
+        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "button-text": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+        "input-text": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+      }
+    },
+  },
+}
+</script>
+
+<style>
+body {
+  background-color: #F3F3F3;
+  font-family: 'Inter', sans-serif;
+}
+.form-input-caps {
+  text-transform: uppercase;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Mobile sidebar overlay */
+#sidebarOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 35;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+#sidebarOverlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Mobile sidebar slide */
+@media (max-width: 767px) {
+  #sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  #sidebar.open {
+    transform: translateX(0);
+  }
+  #mainContent {
+    margin-left: 0 !important;
+  }
+}
+</style>
+</head>
+
+<body class="overflow-x-hidden">
+
+<!-- Top Navigation Bar -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center px-4 md:px-lg h-16 w-full fixed top-0 z-50">
+  <div class="flex items-center gap-sm">
+    <!-- Mobile hamburger -->
+    <button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer md:hidden" id="menuBtn" aria-label="Toggle menu">menu</button>
+    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">assignment_turned_in</span>
+    <h1 class="font-headline-lg text-headline-lg text-primary hidden sm:block">ONLINE REQUEST FORM</h1>
+    <h1 class="font-headline-lg text-[16px] font-semibold text-primary sm:hidden">REQUEST FORM</h1>
+  </div>
+  <div class="flex items-center gap-md">
+    <button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80" aria-label="Account">account_circle</button>
+    <button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80" aria-label="Settings">settings</button>
+  </div>
+</header>
+
+<!-- Sidebar Overlay (mobile) -->
+<div id="sidebarOverlay"></div>
+
+<!-- Sidebar Navigation -->
+<aside class="bg-surface-container-low border-r border-outline-variant flex flex-col fixed left-0 top-0 h-full w-64 z-40 pt-16" id="sidebar">
+  <div class="px-lg py-md mb-md">
+    <h2 class="font-headline-md text-headline-md text-on-surface">Dispatcher Pro</h2>
+    <p class="text-xs font-label-caps text-on-surface-variant opacity-70 uppercase">Enterprise Logistics</p>
+  </div>
+  <nav class="flex-1 px-sm space-y-1">
+    <a class="flex items-center gap-md px-md py-3 rounded-lg bg-primary-container text-on-primary-container font-button-text transition-all duration-150" href="#">
+      <span class="material-symbols-outlined">assignment</span>
+      <span class="font-body-md">Requests</span>
+    </a>
+  </nav>
+  <div class="p-md mt-auto">
+    <div class="flex items-center gap-sm bg-surface-container-high p-sm rounded-lg border border-outline-variant">
+      <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+        <span class="material-symbols-outlined text-on-primary-fixed">person</span>
+      </div>
+      <div class="flex-1 overflow-hidden">
+        <p class="text-xs font-bold truncate">ADMIN_OPERATOR</p>
+        <p class="text-[10px] text-on-surface-variant">Standard Access</p>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content Area -->
+<main class="md:ml-64 pt-16 min-h-screen bg-[#F3F3F3]" id="mainContent">
+  <div class="max-w-5xl mx-auto p-4 md:p-xl">
+
+    <!-- Page Header & Instructions -->
+    <div class="mb-lg flex flex-col sm:flex-row justify-between sm:items-end gap-2">
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-xs">New Logistics Request</h2>
+        <p class="text-xs font-label-caps text-on-surface-variant flex items-center gap-xs">
+          <span class="material-symbols-outlined text-[14px]">info</span>
+          NOTE: DATA ENTRY ALL CAPS
+        </p>
+      </div>
+      <div class="text-xs text-on-surface-variant bg-surface-container-high px-sm py-1 border border-outline-variant w-fit">
+        CONNECTION: <span class="font-mono" id="connectionStatus">CHECKING...</span>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="bg-white border border-outline-variant shadow-sm p-4 md:p-xl">
+      <form class="space-y-form-gap" id="requestForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-xl gap-y-form-gap">
+
+          <!-- 1. DATE REQUESTED -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="date_requested">DATE REQUESTED</label>
+            <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="date_requested" name="date_requested" type="date"/>
+          </div>
+
+          <!-- 2. JOB ID -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="job_id">JOB ID</label>
+            <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="job_id" name="job_id" placeholder="ENTER JOB ID" type="text"/>
+          </div>
+
+          <!-- 3. PARTICULARS (Full Width Span) -->
+          <div class="md:col-span-2 flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="particulars">PARTICULARS</label>
+            <textarea class="p-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none" id="particulars" name="particulars" placeholder="DESCRIBE THE REQUEST PARTICULARS" rows="3"></textarea>
+          </div>
+
+          <!-- 4. CONSIGNEE -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="consignee">CONSIGNEE</label>
+            <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="consignee" name="consignee" placeholder="RECEIVING PARTY" type="text"/>
+          </div>
+
+          <!-- 5. MBL -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="mbl">MBL (MASTER BILL OF LADING)</label>
+            <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="mbl" name="mbl" placeholder="MBL NUMBER" type="text"/>
+          </div>
+
+          <!-- 6. HBL -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="hbl">HBL (HOUSE BILL OF LADING)</label>
+            <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="hbl" name="hbl" placeholder="HBL NUMBER" type="text"/>
+          </div>
+
+          <!-- 7. CONTAINER NUMBER -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="container_number">CONTAINER NUMBER</label>
+            <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="container_number" name="container_number" placeholder="E.G. ABCD1234567" type="text"/>
+          </div>
+
+          <!-- 8. AMOUNT (1) -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="amount_1">TOTAL AMOUNT (VALUATION)</label>
+            <input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="amount_1" name="amount_1" step="0.01" type="number"/>
+          </div>
+
+          <!-- 9. REQUESTED BY -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="requested_by">REQUESTED BY</label>
+            <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="requested_by" name="requested_by" placeholder="PERSONNEL NAME" type="text"/>
+          </div>
+
+          <!-- 10. SUPPLIER'S NAME -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="supplier_name">SUPPLIER'S NAME</label>
+            <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="supplier_name" name="supplier_name" placeholder="SUPPLIER ENTITY" type="text"/>
+          </div>
+
+          <!-- 11. AMOUNT (2) -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="amount_2">SERVICE FEE AMOUNT</label>
+            <input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="amount_2" name="amount_2" step="0.01" type="number"/>
+          </div>
+
+        </div>
+
+        <!-- Footer / Actions -->
+        <div class="pt-xl mt-lg border-t border-[#E5E5E5] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+          <button class="px-lg h-10 border border-[#D1D1D1] text-on-surface-variant font-button-text hover:bg-surface-container transition-colors active:bg-surface-container-high" type="reset">
+            CLEAR FORM
+          </button>
+          <div class="flex gap-md">
+            <button class="bg-primary text-on-primary px-xl h-10 font-button-text hover:bg-[#003d7a] transition-all flex items-center justify-center gap-sm shadow-md active:scale-95 w-full sm:w-auto" id="submitBtn" type="button">
+              <span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+              SUBMIT TO GOOGLE SHEETS
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Recently Submitted Feed -->
+    <div class="mt-lg" id="recentOps">
+      <div class="flex items-center justify-between mb-md">
+        <h3 class="text-xs font-label-caps text-on-surface-variant uppercase">Recent Operations</h3>
+        <div class="h-px flex-1 mx-md bg-outline-variant opacity-30"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-md" id="operationsFeed">
+        <div class="bg-white border border-outline-variant p-md flex items-center gap-md opacity-50">
+          <div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-surface-variant text-[16px]">info</span>
+          </div>
+          <div>
+            <p class="text-[11px] font-bold">Waiting for submissions...</p>
+            <p class="text-[10px] text-on-surface-variant uppercase">No records yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Success Toast (Hidden by default) -->
+<div class="fixed bottom-4 right-4 md:bottom-lg md:right-lg bg-inverse-surface text-inverse-on-surface px-lg py-md shadow-2xl translate-y-20 transition-transform duration-300 flex items-center gap-md z-[100] max-w-[90vw]" id="successToast">
+  <span class="material-symbols-outlined text-green-400">check_circle</span>
+  <div>
+    <p class="font-button-text">Data Synchronized</p>
+    <p class="text-xs opacity-80" id="toastMessage">Row successfully added to Google Sheets.</p>
+  </div>
+</div>
+
+<!-- Error Toast (Hidden by default) -->
+<div class="fixed bottom-4 left-4 md:bottom-lg md:left-lg bg-red-800 text-white px-lg py-md shadow-2xl translate-y-20 transition-transform duration-300 flex items-center gap-md z-[100] max-w-[90vw]" id="errorToast">
+  <span class="material-symbols-outlined text-red-300">error</span>
+  <div>
+    <p class="font-button-text">Sync Failed</p>
+    <p class="text-xs opacity-80" id="errorToastMessage">Could not connect to Google Sheets.</p>
+  </div>
+</div>
+
+<script>
+// ── Configuration ──────────────────────────────────────────────
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx9AatUHCHI4SGOJL5xDscjd3DOLTlFKXXcFs7y1yZYmqZm_arzZI7JKQdweoTqMNM8Nw/exec';
+
+let operationCount = 0;
+
+// ── Mobile Sidebar Toggle ──────────────────────────────────────
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+
+function openSidebar() {
+  sidebar.classList.add('open');
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+menuBtn.addEventListener('click', () => {
+  sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+});
+overlay.addEventListener('click', closeSidebar);
+
+// Close sidebar on window resize to desktop
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 768) closeSidebar();
+});
+
+// ── Connection Status Check ────────────────────────────────────
+async function checkConnection() {
+  const statusEl = document.getElementById('connectionStatus');
+  try {
+    const response = await fetch(WEB_APP_URL, { method: 'GET', mode: 'cors' });
+    if (response.ok || response.type === 'opaque') {
+      statusEl.textContent = 'ONLINE';
+      statusEl.classList.add('text-green-600');
+      statusEl.classList.remove('text-red-600');
+    } else {
+      statusEl.textContent = 'OFFLINE';
+      statusEl.classList.add('text-red-600');
+      statusEl.classList.remove('text-green-600');
+    }
+  } catch {
+    // Google Apps Script redirects may cause CORS on GET — this is normal.
+    // The POST endpoint may still work via no-cors mode. Mark as ready.
+    statusEl.textContent = 'READY';
+    statusEl.classList.remove('text-red-600');
+  }
+}
+checkConnection();
+
+// ── Toasts ─────────────────────────────────────────────────────
+function showToast(type, message) {
+  const toast = type === 'error' ? document.getElementById('errorToast') : document.getElementById('successToast');
+  const msgEl = type === 'error' ? document.getElementById('errorToastMessage') : document.getElementById('toastMessage');
+  msgEl.textContent = message;
+  toast.style.transform = 'translateY(0)';
+  setTimeout(() => {
+    toast.style.transform = 'translateY(120%)';
+  }, 4000);
+}
+
+// ── Operations Feed ────────────────────────────────────────────
+function addOperationEntry(jobId, status) {
+  const feed = document.getElementById('operationsFeed');
+  const empty = feed.querySelector('.opacity-50');
+  if (empty && operationCount === 0) {
+    feed.innerHTML = '';
+  }
+  operationCount++;
+  const div = document.createElement('div');
+  div.className = 'bg-white border border-outline-variant p-md flex items-center gap-md';
+  div.innerHTML = `
+    <div class="w-8 h-8 rounded bg-green-100 flex items-center justify-center">
+      <span class="material-symbols-outlined text-green-700 text-[16px]">check_circle</span>
+    </div>
+    <div>
+      <p class="text-[11px] font-bold">${jobId}</p>
+      <p class="text-[10px] text-on-surface-variant uppercase">${status}</p>
+    </div>
+  `;
+  feed.insertBefore(div, feed.firstChild);
+}
+
+// ── Form Submission (Web-only — no Electron IPC) ───────────────
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  const form = document.getElementById('requestForm');
+
+  const formData = {
+    date_requested: document.getElementById('date_requested').value,
+    job_id: document.getElementById('job_id').value,
+    particulars: document.getElementById('particulars').value,
+    consignee: document.getElementById('consignee').value,
+    mbl: document.getElementById('mbl').value,
+    hbl: document.getElementById('hbl').value,
+    container_number: document.getElementById('container_number').value,
+    amount_1: document.getElementById('amount_1').value,
+    requested_by: document.getElementById('requested_by').value,
+    supplier_name: document.getElementById('supplier_name').value,
+    amount_2: document.getElementById('amount_2').value,
+    timestamp: new Date().toISOString(),
+  };
+
+  // Validate required fields
+  const required = ['date_requested', 'job_id', 'particulars', 'consignee', 'requested_by', 'supplier_name'];
+  for (const field of required) {
+    if (!formData[field]) {
+      const label = field.replace(/_/g, ' ').toUpperCase();
+      showToast('error', `Please fill in all required fields. Missing: ${label}`);
+      document.getElementById(field).focus();
+      return;
+    }
+  }
+
+  // Loading state
+  btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> UPLOADING...`;
+  btn.classList.add('opacity-80', 'cursor-not-allowed');
+  btn.disabled = true;
+
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+      mode: 'cors',
+    });
+    const result = await response.json();
+
+    if (result.success) {
+      showToast('success', 'Data successfully sent to Google Sheets.');
+      addOperationEntry(formData.job_id || 'REQ-NEW', 'Synced Successfully');
+      form.reset();
+    } else {
+      showToast('error', result.error || 'Server error. Please try again.');
+    }
+  } catch (err) {
+    // Fallback: Google Apps Script may redirect with opaque responses
+    // Try no-cors mode as a last resort (won't get response body, but data may still land)
+    try {
+      await fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        mode: 'no-cors',
+      });
+      showToast('success', 'Request sent. Please verify in Google Sheets.');
+      addOperationEntry(formData.job_id || 'REQ-NEW', 'Sent (Verify in Sheets)');
+      form.reset();
+    } catch (fallbackErr) {
+      showToast('error', 'Network error. Check your internet connection.');
+    }
+  } finally {
+    btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_upload</span> SUBMIT TO GOOGLE SHEETS`;
+    btn.classList.remove('opacity-80', 'cursor-not-allowed');
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('submitBtn').addEventListener('click', submitForm);
+
+// ── Auto-capitalize inputs ─────────────────────────────────────
+document.querySelectorAll('.form-input-caps').forEach(input => {
+  input.addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+  });
+});
+
+// ── Set today's date as default ────────────────────────────────
+const dateInput = document.getElementById('date_requested');
+if (dateInput && !dateInput.value) {
+  dateInput.value = new Date().toISOString().split('T')[0];
+}
+</script>
+</body>
+</html>

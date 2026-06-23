@@ -1,0 +1,41 @@
+{
+  "name": "dispatcher-pro",
+  "version": "1.0.0",
+  "description": "Dispatcher Pro - Logistics Request Data Entry Form",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64 --publish never"
+  },
+  "build": {
+    "appId": "com.dispatcher.pro",
+    "productName": "Dispatcher Pro",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": ["nsis", " portable"],
+      "icon": null,
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "sign": false,
+      "signAndEditExecutable": false,
+      "certificateFile": "",
+      "certificatePassword": ""
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "installerIcon": null
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  }
+}

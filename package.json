@@ -1,0 +1,10 @@
+{
+  "name": "dispatcher-pro-web",
+  "version": "1.0.0",
+  "description": "Dispatcher Pro - Logistics Request Data Entry Form (Web Version)",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve public",
+    "build": "echo 'Static site - no build needed'"
+  }
+}
