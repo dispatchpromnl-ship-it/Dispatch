@@ -267,10 +267,10 @@ body {
             <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="container_number" name="container_number" placeholder="E.G. ABCD1234567" type="text"/>
           </div>
 
-          <!-- 8. AMOUNT (1) -->
+          <!-- 8. ACCOUNT NO. -->
           <div class="flex flex-col gap-xs">
-            <label class="text-xs font-label-caps text-on-surface-variant" for="amount_1">TOTAL AMOUNT (VALUATION)</label>
-            <input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="amount_1" name="amount_1" step="0.01" type="number"/>
+            <label class="text-xs font-label-caps text-on-surface-variant" for="account_no">ACCOUNT NO.</label>
+            <input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="account_no" name="account_no" placeholder="ACCOUNT NUMBER" type="text"/>
           </div>
 
           <!-- 9. REQUESTED BY -->
@@ -285,10 +285,28 @@ body {
             <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="supplier_name" name="supplier_name" placeholder="SUPPLIER ENTITY" type="text"/>
           </div>
 
-          <!-- 11. AMOUNT (2) -->
+          <!-- 11. SERVICE FEE AMOUNT -->
           <div class="flex flex-col gap-xs">
             <label class="text-xs font-label-caps text-on-surface-variant" for="amount_2">SERVICE FEE AMOUNT</label>
             <input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="amount_2" name="amount_2" step="0.01" type="number"/>
+          </div>
+
+          <!-- 12. BANK NAME -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="bank_name">BANK NAME</label>
+            <input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="bank_name" name="bank_name" placeholder="E.G. BDO, BPI, METROBANK" type="text"/>
+          </div>
+
+          <!-- 13. PAYMENT STATUS -->
+          <div class="flex flex-col gap-xs">
+            <label class="text-xs font-label-caps text-on-surface-variant" for="payment_status">PAYMENT STATUS</label>
+            <select class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="payment_status" name="payment_status">
+              <option value="">-- SELECT STATUS --</option>
+              <option value="PAID">PAID</option>
+              <option value="UNPAID">UNPAID</option>
+              <option value="PENDING">PENDING</option>
+              <option value="PARTIAL">PARTIAL</option>
+            </select>
           </div>
 
         </div>
@@ -451,10 +469,12 @@ async function submitForm() {
     mbl: document.getElementById('mbl').value,
     hbl: document.getElementById('hbl').value,
     container_number: document.getElementById('container_number').value,
-    amount_1: document.getElementById('amount_1').value,
+    account_no: document.getElementById('account_no').value,
     requested_by: document.getElementById('requested_by').value,
     supplier_name: document.getElementById('supplier_name').value,
     amount_2: document.getElementById('amount_2').value,
+    bank_name: document.getElementById('bank_name').value,
+    payment_status: document.getElementById('payment_status').value,
     timestamp: new Date().toISOString(),
   };
 

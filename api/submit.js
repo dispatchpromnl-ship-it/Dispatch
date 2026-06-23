@@ -13,10 +13,12 @@ const COLUMNS = [
   'MBL',
   'HBL',
   'CONTAINER NUMBER',
-  'TOTAL AMOUNT (VALUATION)',
+  'ACCOUNT NO.',
   'REQUESTED BY',
   "SUPPLIER'S NAME",
   'SERVICE FEE AMOUNT',
+  'BANK NAME',
+  'PAYMENT STATUS',
   'TIMESTAMP',
 ];
 
@@ -29,10 +31,12 @@ const KEY_MAP = {
   mbl              : 'MBL',
   hbl              : 'HBL',
   container_number : 'CONTAINER NUMBER',
-  amount_1         : 'TOTAL AMOUNT (VALUATION)',
+  account_no       : 'ACCOUNT NO.',
   requested_by     : 'REQUESTED BY',
   supplier_name    : "SUPPLIER'S NAME",
   amount_2         : 'SERVICE FEE AMOUNT',
+  bank_name        : 'BANK NAME',
+  payment_status   : 'PAYMENT STATUS',
   timestamp        : 'TIMESTAMP',
 };
 
