@@ -183,7 +183,72 @@ CONNECTION: <span class="font-mono" id="connectionStatus">CHECKING...</span>
 </div>
 <div class="md:col-span-2 flex flex-col gap-xs">
 <label class="text-xs font-label-caps text-on-surface-variant" for="particulars">PARTICULARS</label>
-<textarea class="p-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none" id="particulars" name="particulars" placeholder="DESCRIBE THE REQUEST PARTICULARS" rows="3"></textarea>
+<select class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="particulars" name="particulars">
+  <option value="" disabled selected>SELECT PARTICULARS</option>
+  <option>-</option>
+  <option>ALLOWANCES</option>
+  <option>BREAKBULK INSPECTION</option>
+  <option>BROKER FEE &amp; PORT CHARGES</option>
+  <option>BROKERAGE &amp; PORT</option>
+  <option>BUSINESS PERMIT</option>
+  <option>CDEC EIP/AEDS</option>
+  <option>CDEC FUNDING</option>
+  <option>CONDEP</option>
+  <option>CONDEP REFUND</option>
+  <option>CONTAINER DEPOSIT</option>
+  <option>CONTAINER REFUND</option>
+  <option>CONTRACTOR</option>
+  <option>CTF</option>
+  <option>CTF / CUSTOMS</option>
+  <option>DELIVERY CHARGE</option>
+  <option>DEMURRAGE CHARGE</option>
+  <option>DETENTION</option>
+  <option>DETENTION CHARGE/ORIGIN CHARGE</option>
+  <option>DETENTION CHARGES</option>
+  <option>DUTIES &amp; TAXES</option>
+  <option>EKONEK EIP</option>
+  <option>EKONEK VASP</option>
+  <option>ENCASHMENT</option>
+  <option>ETRACC</option>
+  <option>EZTS</option>
+  <option>FABRICATION</option>
+  <option>FORKLIFT RENTAL</option>
+  <option>FRANCHISE FEE</option>
+  <option>FREIGHT&amp;LIFT ON/OFF CHARGES</option>
+  <option>INSTALLATION OF SIGNAGES</option>
+  <option>INTERCOMMERCE VASP</option>
+  <option>INTERCOMMER FUNDING</option>
+  <option>LATE DELIVERY ORDER FEE</option>
+  <option>LOCAL</option>
+  <option>LOCAL &amp; CONDEP</option>
+  <option>LOCAL CHARGE</option>
+  <option>LOCAL CHARGE &amp; CONDEP</option>
+  <option>LOCAL CHARGES</option>
+  <option>MANIFEST &amp; TURNOVER FEE</option>
+  <option>OCEAN FREIGHT</option>
+  <option>ORIGIN CHARGE</option>
+  <option>ORIGIN CHARGES &amp; OCEAN FREIGHT</option>
+  <option>ORGIN CHARGE</option>
+  <option>PCF REPLENISHMENT</option>
+  <option>PERSONAL</option>
+  <option>PORT CHARGES</option>
+  <option>PROCESSING</option>
+  <option>PROCESSING &amp; PORT CHARGES</option>
+  <option>PTOPS IT FEE</option>
+  <option>RACKING INSTALLMENT</option>
+  <option>RENEWAL FEE FOR SURETY INSURANCE BOND</option>
+  <option>REPLENISHMENT</option>
+  <option>SMARTLINK PRE-ADVCE</option>
+  <option>SPONSORSHIP</option>
+  <option>STORAGE</option>
+  <option>STORAGE FEE</option>
+  <option>STRUCTURAL ANALYSIS</option>
+  <option>SURVEY REPORT CHARGE</option>
+  <option>TRUCKING CHARGE</option>
+  <option>TURNOVER</option>
+  <option>TURNOVER FEE</option>
+  <option>WAREHOUSE RENTAL</option>
+</select>
 </div>
 <div class="flex flex-col gap-xs">
 <label class="text-xs font-label-caps text-on-surface-variant" for="consignee">CONSIGNEE</label>
@@ -211,7 +276,171 @@ CONNECTION: <span class="font-mono" id="connectionStatus">CHECKING...</span>
 </div>
 <div class="flex flex-col gap-xs">
 <label class="text-xs font-label-caps text-on-surface-variant" for="supplier_name">SUPPLIER'S NAME</label>
-<input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="supplier_name" name="supplier_name" placeholder="SUPPLIER ENTITY" type="text"/>
+<select class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="supplier_name" name="supplier_name">
+  <option value="" disabled selected>SELECT SUPPLIER</option>
+  <option>ABDULMUGNIE A. ACMAD</option>
+  <option>AFFOGATO CORP.</option>
+  <option>AGX GLOBAL EXPRESS INC.</option>
+  <option>AMYHR HUSSIEN MANALAO DOMADO</option>
+  <option>APL CO PTE LTD</option>
+  <option>ASCENT SOLUTIONS PHILIPPINES INC.</option>
+  <option>ASIAN CONSOLIDATION INT'L SERVICES INC.</option>
+  <option>ASIAN CONSOLIDATION INT'L SERVICES INC. NEW</option>
+  <option>ASIAEVOLUTION INC.</option>
+  <option>AUTOLIV CEBU SAFETY MANUFACTURING, INC.</option>
+  <option>AWARDS CARGO AGENCY</option>
+  <option>AWARDS CARGO AGENCY PHILS., INC.</option>
+  <option>BANK OF THE PHILIPPINE ISLANDS</option>
+  <option>BANK OF THE PHILIPPINE ISLANDS DVO</option>
+  <option>BEN LINE AGENCIES PHILIPPINES, INC.</option>
+  <option>BILLY JEO RAMOS</option>
+  <option>BOEING MATERIAL HANDLING CORP.</option>
+  <option>BRUCE FOSSILSTONES INT'L CORP.</option>
+  <option>BRUCE FOSSILSTONES INTERNATIONAL CORPORATION</option>
+  <option>BUREAU OF CUSTOMS</option>
+  <option>CARGO DATA EXCHANGE CENTER, INC.</option>
+  <option>CARGOWORTHY FREIGHT SERVICES INC.</option>
+  <option>CEBU MITSUMI INC.</option>
+  <option>CHRISTINE ETHEL MENDOZA</option>
+  <option>CITIBANK FAO FEDERAL EXPRESS PACIFIC,LLC</option>
+  <option>CLIO Shipping and Logistics (Philippines) Inc.</option>
+  <option>CMA CGM PHILIPPINES INC.</option>
+  <option>CMA CGM PHILIPPINES INC - BDO</option>
+  <option>CMA CGM PHILIPPINES INC - HSBC</option>
+  <option>COLORSTEEL SYSTEM CORP.</option>
+  <option>COMPOSTELA STEEL</option>
+  <option>CONSOLATRIX TRUCKING SERVICES</option>
+  <option>CONTAINER LEDGER ACCOUNT PHILS., INC.</option>
+  <option>COSONSA MANUFACTURING INC.</option>
+  <option>COSCO SHIPPING LINES (PHILIPPINES) INC.</option>
+  <option>COTECNA ELITE PHILIPPINES INC.</option>
+  <option>COTS FREIGHT INTERNATIONAL, INC.</option>
+  <option>COTS FREIGHT INTERNATIONAL, INC.1</option>
+  <option>CREST FORWARDER INC.</option>
+  <option>DENNIS INTERNATIONAL MERCHANDISING INC</option>
+  <option>EAGLE EXPRESS LINES INC.</option>
+  <option>EAGLE EXPRESS LINES INC. 2</option>
+  <option>EAST LINE CEBU INC</option>
+  <option>EAST LINE CEBU INC.</option>
+  <option>ECU WORLDWIDE (PHILIPPINES) INC.</option>
+  <option>EFE INDUSTRIAL SOLUTION INC</option>
+  <option>EHNCOR FREIGHT SERVICES INC.</option>
+  <option>EKONEK PILIPINA INC.</option>
+  <option>EVERGREEN LOGISTICS PHILIPPINES CORPORATION</option>
+  <option>EVERGREEN SHIPPING AGENCY</option>
+  <option>EVERGREEN SHIPPING AGENCY - DAVAO</option>
+  <option>EVERGREEN SHIPPING AGENCY PHILS., CORP.</option>
+  <option>EVERGREEN SHIPPING AGENCY PHILIPPINES CORPORATION</option>
+  <option>EVERGREEN SHIPPING UBP</option>
+  <option>EXPEDITORS PHILIPPINES, INC.</option>
+  <option>EYE CARGO LOGISTICS INC</option>
+  <option>FOX LOGISTICS PHILS. INC.</option>
+  <option>FTZ SOLUTIONS INC</option>
+  <option>G&amp;P GLOBAL PACIFIC INTERNATIONAL FREIGHT LOGISTICS, INC.</option>
+  <option>GEOJET LOGISTICS SERVICES INC.</option>
+  <option>GLI-GLOBAL IMPEX CONSOLIDATION, INC.</option>
+  <option>GLOBELINK NVOCC PHILS., INC.</option>
+  <option>GOLDEN ARROW TRUCKING SERVICES</option>
+  <option>GTI LOGISTICS CORPORATION</option>
+  <option>HAMDANEE AMEROL</option>
+  <option>HAZEL BIANCA REMEDIO</option>
+  <option>HSBC FAO CMA CGM PHILIPPINES, INC - CNC</option>
+  <option>HSBC FAO OCEAN NETWORK EXPRESS</option>
+  <option>INTERCOMMERCE NETWORK SERVICE</option>
+  <option>INTERNATIONAL ELEVATOR &amp; EQUIPMENT, INC.</option>
+  <option>JAKE TERRENCE EGUNA</option>
+  <option>JAMES CONLU</option>
+  <option>JENNY JOY GRANADA</option>
+  <option>JOSE ALWEN RODRIGUEZ</option>
+  <option>JUGRO TRANSPORT INT'L. PHILS. CORP.</option>
+  <option>JULIUS CEAZAR JARDIN</option>
+  <option>K5 PLUS LOGISTICS CORPORATION</option>
+  <option>KARGOSMART GLOBAL CORP.</option>
+  <option>KRISTIE ANO-OS</option>
+  <option>LBP CEBU BOC BRANCH IFO BOC FAO ARIE CEBU COSMETIC CORP</option>
+  <option>LBP CEBU BOC BRANCH IFO BOC FAO AUTOLIV CEBU SAFETY MANUFACTURING INC.</option>
+  <option>LBP CEBU BOC BRANCH IFO BOC FAO CEBU MITSUMI INC.</option>
+  <option>LIBERTY INSURANCE CORP.</option>
+  <option>LUISA EVELYN GO</option>
+  <option>MAC XAVIER LOGISTICS</option>
+  <option>MAC-NELS LINE INC.</option>
+  <option>MAC-NELS LINE INC. 2</option>
+  <option>MAERSK FILIPINAS, INC.</option>
+  <option>MANDAUE CITY TREASURER</option>
+  <option>MANILA ADJUSTERS AND SURVEYORS COMPANY</option>
+  <option>MARIA SALOME ARESCO</option>
+  <option>MARICEL T. MUSTAPHA</option>
+  <option>MATTNICK (MN) CONTAINER LINES INC.</option>
+  <option>MCC TRANSPORT PHILIPPINES INC</option>
+  <option>MEPZ-PMA</option>
+  <option>MERCURY FREIGHT INTERNATIONAL INC</option>
+  <option>MICHAEL ANGELO TORRES YUSON</option>
+  <option>MIGENLOGISTICS CORPORATION</option>
+  <option>MINDANAO ICTSI</option>
+  <option>MINDANAO ICTSI 1</option>
+  <option>MIROLA HAMOY</option>
+  <option>MOL LOGISTICS PHILIPPINES INC.</option>
+  <option>MONIC GABUYA</option>
+  <option>MSTAR SHIP AGENCIES INC.</option>
+  <option>MYEG PHILIPPINES</option>
+  <option>NISSIN TRANSPORT PHILIPPINES CORPORATION</option>
+  <option>NNR GLOBAL LOGISTICS (PHILS.) INC.</option>
+  <option>NNR GLOBAL LOGISTICS (PHILIPPINES) INC.</option>
+  <option>OCEAN NETWORK EXPRESS</option>
+  <option>OCEAN NETWORK EXPRESS PHILS., INC.</option>
+  <option>OCEAN NETWORK EXPRESS PHILS., INC. 1</option>
+  <option>OCEAN NETWORK EXPRESS PHILS., INC. - CONDEP</option>
+  <option>ONE GLOBAL LOGISTICS CORP.</option>
+  <option>ONE NETWORK EXPRESS PHILIPPINES INC - LINER</option>
+  <option>ONE WORLD LOGISTICS CEBU INC</option>
+  <option>OOCL PHILS INC.</option>
+  <option>PACIFIC CONCORD CONTAINER LINES, INC.</option>
+  <option>PAUL JOHN OSWA</option>
+  <option>PAUL JOHN OSWA / ENCASHMENT</option>
+  <option>PENANSHIN SHIPPING PHILS., INC.</option>
+  <option>PHIL WORLD FREIGHT FORWARDING INC</option>
+  <option>PHILIPPINES LIGHT-LEATHER INC.</option>
+  <option>PLAS ENTERPRISES &amp; ENGINEERING SERVICES</option>
+  <option>PORT NET LOGISTICS INC</option>
+  <option>PROLINE LOGISTIC PHILIPPINES INC</option>
+  <option>PROLINE LOGISTICS PHILIPPINES INC.</option>
+  <option>PTOPS</option>
+  <option>PWL PRESTIGE WAREHOUSING</option>
+  <option>PWL PRESTIGE WAREHOUSING &amp; LOGISTICS INC.</option>
+  <option>RAMONITO MA-ANO</option>
+  <option>RAPID INC.</option>
+  <option>REMAR F. MANSARI</option>
+  <option>REY F. MERANO</option>
+  <option>REYMAR LABANON</option>
+  <option>RONALD JABAGAT</option>
+  <option>RORY S. CUNAN</option>
+  <option>RUNSAME ORNOPIO RAPESORA</option>
+  <option>RUNSAME RAPESORA</option>
+  <option>SEAHAWK TRANSPORT INC.</option>
+  <option>SEAHAWK TRANSPORT INC. NEW</option>
+  <option>SEALAND MAERSK ASIA PTE LTD</option>
+  <option>SHIPCO TRANSPORT PHILIPPINES INC.</option>
+  <option>SITC CONTAINER LINES PHILS., INC.</option>
+  <option>SITC CONTAINER LINES PHILS., INC. 2</option>
+  <option>SOLIDOR TRUCKING SERVICES</option>
+  <option>SOUTHLINK GLOBAL LOGISTICS, INC.</option>
+  <option>STERLINK FREIGHT INC.</option>
+  <option>SWIFT MODAL INT'L LOGISTICS INC.</option>
+  <option>TPI GLOBAL FORWARDING</option>
+  <option>TOBIAS E. MANALO</option>
+  <option>TOMAS D. ALCANTARA</option>
+  <option>TRANSCONTAINER (TCL) PHILIPPINES, INC.</option>
+  <option>TRANSMODAL INTERNATIONAL INC.</option>
+  <option>TRIPLE V WORLDWIDE LOGISTICS INC.</option>
+  <option>WAN HAI LINES (PHILS.,) INC.</option>
+  <option>WAN HAI LINES (PHILS.,) INC. 2</option>
+  <option>WALLEM PHILIPPINES SHIPPING, INC.</option>
+  <option>YANG MING SHIPPING PHILS., INC.</option>
+  <option>YANG MING SHIPPING PHILS., INC. 2</option>
+  <option>YANG MING SHIPPING PHILS., INC. 3</option>
+  <option>YANG MING SHIPPING PHILS., INC. 4</option>
+  <option>ZIM INTEGRATED SHIPPING SERVICES LTD</option>
+</select>
 </div>
 <div class="flex flex-col gap-xs">
 <label class="text-xs font-label-caps text-on-surface-variant" for="amount_2">SERVICE FEE AMOUNT</label>
