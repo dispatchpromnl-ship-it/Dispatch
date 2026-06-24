@@ -42,9 +42,9 @@ function doPost(e) {
     // Expected column headers (must match row 1 of the sheet exactly)
     var expectedHeaders = [
       'DATE REQUESTED', 'JOB ID', 'PARTICULARS', 'CONSIGNEE',
-      'MBL', 'HBL', 'CONTAINER NUMBER',
-      'TOTAL AMOUNT (VALUATION)', 'REQUESTED BY',
-      "SUPPLIER'S NAME", 'SERVICE FEE AMOUNT', 'TIMESTAMP'
+      'MBL', 'HBL', 'CONTAINER NUMBER', 'REQUESTED BY',
+      "SUPPLIER'S NAME", 'ACCOUNT NO.', 'BANK NAME', 'TOTAL AMOUNT',
+      'PAYMENT STATUS', 'TIMESTAMP'
     ];
 
     var activeHeaders = headers.length > 0 ? headers : expectedHeaders;
@@ -64,10 +64,12 @@ function doPost(e) {
       mbl              : 'MBL',
       hbl              : 'HBL',
       container_number : 'CONTAINER NUMBER',
-      amount_1         : 'TOTAL AMOUNT (VALUATION)',
       requested_by     : 'REQUESTED BY',
       supplier_name    : "SUPPLIER'S NAME",
-      amount_2         : 'SERVICE FEE AMOUNT',
+      account_no       : 'ACCOUNT NO.',
+      bank_name        : 'BANK NAME',
+      amount_2         : 'TOTAL AMOUNT',
+      payment_status   : 'PAYMENT STATUS',
       timestamp        : 'TIMESTAMP'
     };
 
