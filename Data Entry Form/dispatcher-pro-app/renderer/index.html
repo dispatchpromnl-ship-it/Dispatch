@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    } else {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    }
+  })();
+</script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Dispatcher Pro - Logistics Request Form</title>
@@ -18,48 +30,48 @@ tailwind.config = {
         "error": "#ba1a1a",
         "tertiary-fixed-dim": "#c6c6c7",
         "tertiary-container": "#5f6060",
-        "surface-container-low": "#f6f3f2",
+        "surface-container-low": "var(--color-surface-container-low)",
         "secondary": "#4c616c",
-        "on-primary": "#ffffff",
+        "on-primary": "var(--color-on-primary)",
         "on-primary-fixed-variant": "#00468b",
-        "outline-variant": "#c2c6d4",
-        "outline": "#727783",
+        "outline-variant": "var(--color-outline-variant)",
+        "outline": "var(--color-outline)",
         "primary-fixed-dim": "#a8c8ff",
         "on-secondary-fixed-variant": "#354a53",
         "inverse-primary": "#a8c8ff",
-        "on-primary-fixed": "#001b3d",
-        "primary-fixed": "#d6e3ff",
-        "surface-container": "#f0eded",
-        "on-surface": "#1b1b1b",
-        "inverse-on-surface": "#f3f0ef",
-        "inverse-surface": "#313030",
+        "on-primary-fixed": "var(--color-on-primary-fixed)",
+        "primary-fixed": "var(--color-primary-fixed)",
+        "surface-container": "var(--color-surface-container)",
+        "on-surface": "var(--color-on-surface)",
+        "inverse-on-surface": "var(--color-inverse-on-surface)",
+        "inverse-surface": "var(--color-inverse-surface)",
         "on-secondary": "#ffffff",
         "on-tertiary-container": "#dbdbdb",
         "on-tertiary-fixed": "#1a1c1c",
-        "primary-container": "#005fb8",
-        "secondary-container": "#cfe6f2",
+        "primary-container": "var(--color-primary-container)",
+        "secondary-container": "var(--color-secondary-container)",
         "secondary-fixed-dim": "#b4cad6",
         "on-tertiary-fixed-variant": "#454747",
         "tertiary": "#474849",
         "surface-variant": "#e5e2e1",
-        "on-primary-container": "#cadcff",
+        "on-primary-container": "var(--color-on-primary-container)",
         "tertiary-fixed": "#e2e2e2",
-        "on-background": "#1b1b1b",
-        "surface-bright": "#fcf9f8",
-        "background": "#fcf9f8",
-        "surface-container-high": "#eae7e7",
-        "surface-dim": "#dcd9d9",
+        "on-background": "var(--color-on-surface)",
+        "surface-bright": "var(--color-surface)",
+        "background": "var(--color-background)",
+        "surface-container-high": "var(--color-surface-container-high)",
+        "surface-dim": "var(--color-surface-dim)",
         "surface-tint": "#005db5",
-        "surface": "#fcf9f8",
+        "surface": "var(--color-surface)",
         "on-error": "#ffffff",
         "error-container": "#ffdad6",
         "secondary-fixed": "#cfe6f2",
         "on-tertiary": "#ffffff",
-        "on-secondary-container": "#526772",
-        "primary": "#00488d",
-        "surface-container-lowest": "#ffffff",
-        "surface-container-highest": "#e5e2e1",
-        "on-surface-variant": "#424752"
+        "on-secondary-container": "var(--color-on-secondary-container)",
+        "primary": "var(--color-primary)",
+        "surface-container-lowest": "var(--color-surface-container-lowest)",
+        "surface-container-highest": "var(--color-surface-container-highest)",
+        "on-surface-variant": "var(--color-on-surface-variant)"
       },
       "borderRadius": {
         "DEFAULT": "0.125rem",
@@ -98,10 +110,110 @@ tailwind.config = {
 }
 </script>
 <style>
-body {
-  background-color: #F3F3F3;
-  font-family: 'Inter', sans-serif;
+:root, html.light {
+  --color-primary: #00488d;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #005fb8;
+  --color-on-primary-container: #cadcff;
+  --color-primary-fixed: #d6e3ff;
+  --color-on-primary-fixed: #001b3d;
+  --color-surface: #fcf9f8;
+  --color-on-surface: #1b1b1b;
+  --color-surface-dim: #dcd9d9;
+  --color-surface-container-low: #f6f3f2;
+  --color-surface-container: #f0eded;
+  --color-surface-container-high: #eae7e7;
+  --color-surface-container-highest: #e5e2e1;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface-variant: #424752;
+  --color-outline: #727783;
+  --color-outline-variant: #c2c6d4;
+  --color-background: #fcf9f8;
+  --color-secondary-container: #cfe6f2;
+  --color-on-secondary-container: #526772;
+  --color-inverse-surface: #313030;
+  --color-inverse-on-surface: #f3f0ef;
+  --color-app-bg: #F3F3F3;
 }
+
+html.dark {
+  --color-primary: #a8c8ff;
+  --color-on-primary: #003062;
+  --color-primary-container: #00468b;
+  --color-on-primary-container: #d6e3ff;
+  --color-primary-fixed: #00468b;
+  --color-on-primary-fixed: #d6e3ff;
+  --color-surface: #121318;
+  --color-on-surface: #e2e2e9;
+  --color-surface-dim: #1a1c22;
+  --color-surface-container-low: #1a1c22;
+  --color-surface-container: #1e2027;
+  --color-surface-container-high: #2a2c34;
+  --color-surface-container-highest: #33353c;
+  --color-surface-container-lowest: #14161a;
+  --color-on-surface-variant: #a2a7b4;
+  --color-outline: #8c919e;
+  --color-outline-variant: #424752;
+  --color-background: #121318;
+  --color-secondary-container: #334856;
+  --color-on-secondary-container: #cfe6f2;
+  --color-inverse-surface: #f3f0ef;
+  --color-inverse-on-surface: #1b1b1b;
+  --color-app-bg: #0c0d12;
+}
+
+body {
+  background-color: var(--color-app-bg);
+  color: var(--color-on-surface);
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+header, aside, main, div, button, input, select, textarea, a, h1, h2, p, span {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Ensure static elements adapt */
+.dark .bg-white {
+  background-color: var(--color-surface-container-lowest) !important;
+}
+.dark .bg-\[\#F3F3F3\] {
+  background-color: var(--color-app-bg) !important;
+}
+.dark input, .dark select, .dark textarea {
+  background-color: var(--color-surface-container-lowest) !important;
+  color: var(--color-on-surface) !important;
+  border-color: var(--color-outline-variant) !important;
+}
+.dark input:focus, .dark select:focus, .dark textarea:focus {
+  border-color: var(--color-primary) !important;
+  --tw-ring-color: var(--color-primary) !important;
+}
+.dark label {
+  color: var(--color-on-surface-variant) !important;
+}
+.dark select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a2a7b4' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+}
+
+/* Operation feed entries style */
+.dark #operationsFeed div {
+  background-color: var(--color-surface-container-low) !important;
+  border-color: var(--color-outline-variant) !important;
+}
+.dark #operationsFeed div p {
+  color: var(--color-on-surface) !important;
+}
+.dark #operationsFeed div p.text-on-surface-variant {
+  color: var(--color-on-surface-variant) !important;
+}
+.dark #operationsFeed div .bg-green-100 {
+  background-color: #064e3b !important;
+}
+.dark #operationsFeed div .text-green-700 {
+  color: #34d399 !important;
+}
+
 .form-input-caps {
   text-transform: uppercase;
 }
@@ -112,14 +224,22 @@ body {
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
+.dark ::-webkit-scrollbar-track {
+  background: #1b1c21;
+}
 ::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 4px;
 }
+.dark ::-webkit-scrollbar-thumb {
+  background: #424656;
+}
 ::-webkit-scrollbar-thumb:hover {
   background: #a1a1a1;
 }
-</style>
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #5d6278;
+}
 </head>
 <body class="overflow-hidden">
 <header class="bg-surface border-b border-outline-variant flex justify-between items-center px-lg h-16 w-full fixed top-0 z-50">
@@ -128,8 +248,10 @@ body {
 <h1 class="font-headline-lg text-headline-lg text-primary">ONLINE REQUEST FORM</h1>
 </div>
 <div class="flex items-center gap-md">
-<button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80">account_circle</button>
-<button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80">settings</button>
+<div class="h-12 flex items-center justify-center bg-white px-3 py-1 rounded border border-outline-variant shadow-sm" aria-label="AGX Logo">
+  <img src="./agx-logo.png" alt="AGX Logo" class="h-10 object-contain" />
+</div>
+<button id="themeToggleBtn" class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80" aria-label="Toggle Theme">dark_mode</button>
 </div>
 </header>
 <aside class="bg-surface-container-low border-r border-outline-variant flex flex-col fixed left-0 top-0 h-full w-64 z-40 pt-16">
@@ -596,6 +718,33 @@ document.querySelectorAll('.form-input-caps').forEach(input => {
     this.value = this.value.toUpperCase();
   });
 });
+
+// ── Theme Toggle Logic ─────────────────────────────────────────
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+function updateThemeUI(theme) {
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light');
+    if (themeToggleBtn) themeToggleBtn.textContent = 'light_mode';
+  } else {
+    document.documentElement.classList.add('light');
+    document.documentElement.classList.remove('dark');
+    if (themeToggleBtn) themeToggleBtn.textContent = 'dark_mode';
+  }
+}
+
+// Initial UI sync
+const currentTheme = localStorage.getItem('theme') || 'light';
+updateThemeUI(currentTheme);
+
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener('click', () => {
+    const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+    localStorage.setItem('theme', newTheme);
+    updateThemeUI(newTheme);
+  });
+}
 </script>
 </body>
 </html>
