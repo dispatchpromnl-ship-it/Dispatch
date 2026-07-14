@@ -139,25 +139,35 @@ module.exports = async function handler(req, res) {
       });
 
       // ── Check for duplicate JOB ID in PENDING and DATABASE ──────────────
-      const jobId = data.job_id || '';
+      const jobId = (data.job_id || '').trim();
       if (jobId) {
-        const [pendingRes, dbRes] = await Promise.all([
-          sheets.spreadsheets.values.get({
-            spreadsheetId: SPREADSHEET_ID, range: `${PENDING_SHEET}!B2:B`,
-          }).catch(() => ({ data: { values: [] } })),
-          sheets.spreadsheets.values.get({
-            spreadsheetId: SPREADSHEET_ID, range: `${DATABASE_SHEET}!B2:B`,
-          }).catch(() => ({ data: { values: [] } })),
-        ]);
+        let pendingIds = [];
+        let dbIds = [];
 
-        const pendingIds = (pendingRes.data.values || []).map(r => (r[0] || '').trim().toUpperCase());
-        const dbIds = (dbRes.data.values || []).map(r => (r[0] || '').trim().toUpperCase());
-        const allIds = [...pendingIds, ...dbIds];
+        try {
+          const pendingRes = await sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID, range: `${PENDING_SHEET}!B:B`,
+          });
+          pendingIds = (pendingRes.data.values || []).slice(1).map(r => (r[0] || '').trim().toUpperCase());
+        } catch (e) {
+          console.error('[approve.js] Failed to read PENDING for duplicate check:', e.message);
+        }
 
-        if (allIds.includes(jobId.trim().toUpperCase())) {
+        try {
+          const dbRes = await sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID, range: `${DATABASE_SHEET}!B:B`,
+          });
+          dbIds = (dbRes.data.values || []).slice(1).map(r => (r[0] || '').trim().toUpperCase());
+        } catch (e) {
+          console.error('[approve.js] Failed to read DATABASE for duplicate check:', e.message);
+        }
+
+        console.log(`[approve.js] Duplicate check for "${jobId.toUpperCase()}": PENDING=${pendingIds.length} entries, DATABASE=${dbIds.length} entries`);
+
+        if (pendingIds.includes(jobId.toUpperCase()) || dbIds.includes(jobId.toUpperCase())) {
           return res.status(409).json({
             success: false,
-            error: `Job ID "${jobId}" already exists. Duplicate entries are not allowed.`,
+            error: `Job ID "${jobId}" already exists in the system. Duplicate entries are not allowed.`,
           });
         }
       }
