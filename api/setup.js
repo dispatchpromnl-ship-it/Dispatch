@@ -40,12 +40,10 @@ module.exports = async function handler(req, res) {
     const existingSheets = spreadsheet.data.sheets.map(s => s.properties.title);
 
     const sheetsToCreate = [];
-    if (!existingSheets.includes('USERS')) {
-      sheetsToCreate.push({ addSheet: { properties: { title: 'USERS' } } });
-    }
-    if (!existingSheets.includes('PENDING')) {
-      sheetsToCreate.push({ addSheet: { properties: { title: 'PENDING' } } });
-    }
+    if (!existingSheets.includes('USERS')) sheetsToCreate.push({ addSheet: { properties: { title: 'USERS' } } });
+    if (!existingSheets.includes('PENDING')) sheetsToCreate.push({ addSheet: { properties: { title: 'PENDING' } } });
+    if (!existingSheets.includes('DATABASE')) sheetsToCreate.push({ addSheet: { properties: { title: 'DATABASE' } } });
+    if (!existingSheets.includes('AUDIT_LOG')) sheetsToCreate.push({ addSheet: { properties: { title: 'AUDIT_LOG' } } });
 
     if (sheetsToCreate.length > 0) {
       await sheets.spreadsheets.batchUpdate({
