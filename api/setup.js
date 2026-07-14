@@ -135,6 +135,23 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    // ── Create AUDIT_LOG sheet ───────────────────────────────────────────────
+    const auditHeaders = ['TIMESTAMP', 'ACTION', 'USER', 'DETAILS', 'TARGET'];
+
+    const auditData = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'AUDIT_LOG!A1:A1',
+    });
+
+    if (!auditData.data.values || auditData.data.values.length === 0) {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'AUDIT_LOG!A1',
+        valueInputOption: 'RAW',
+        requestBody: { values: [auditHeaders] },
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: 'Setup complete! USERS and PENDING sheets created with default accounts.',

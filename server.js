@@ -328,6 +328,11 @@ app.put('/api/approve', (req, res) => {
   });
 });
 
+// ── Deprecated /api/submit — reject old cached frontends ─────────────────────
+app.all('/api/submit', (req, res) => {
+  res.status(410).json({ success: false, error: 'Deprecated. Please refresh your browser.' });
+});
+
 // ── Catch-all: serve index.html ──────────────────────────────────────────────
 
 // GET /api/audit
