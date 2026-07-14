@@ -686,9 +686,9 @@ async function submitForm() {
       form.reset();
       document.getElementById('date_requested').value = new Date().toISOString().split('T')[0];
     } else {
-      showToast('error', result.error || 'Server error.');
+      showToast('error', result.error || 'Submission failed.');
     }
-  } catch { showToast('error', 'Network error.'); }
+  } catch (e) { showToast('error', 'Failed to submit: ' + (e.message || 'Unknown error')); console.error('[submitForm]', e); }
   finally {
     btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_upload</span> SUBMIT FOR APPROVAL`;
     btn.disabled = false;
