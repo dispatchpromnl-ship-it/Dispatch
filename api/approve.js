@@ -199,7 +199,7 @@ module.exports = async function handler(req, res) {
       const auditJobId = data.job_id || 'N/A';
       await writeAuditLog('REQUEST_SUBMITTED', submittedBy, `Job ID: ${auditJobId} | ${data.particulars || ''} | ₱${data.amount_2 || '0'}`, '');
 
-      return res.status(200).json({ success: true, message: 'Request submitted for approval.', _v: '2.0' });
+      return res.status(200).json({ success: true, message: 'Request submitted for approval.' });
     }
 
     // ── PUT: Approve or reject a request ─────────────────────────────────────
