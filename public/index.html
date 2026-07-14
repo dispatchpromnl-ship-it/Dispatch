@@ -657,8 +657,25 @@ async function submitForm() {
       return;
     }
   }
-  btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> SUBMITTING...`;
+  btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> CHECKING...`;
   btn.disabled = true;
+
+  try {
+    const checkResp = await fetch('/api/check-job-id');
+    const checkData = await checkResp.json();
+    if (checkData.success && checkData.allIds) {
+      if (checkData.allIds.includes(formData.job_id.trim().toUpperCase())) {
+        showToast('error', 'Job ID "' + formData.job_id + '" already exists in the system. Duplicate entries are not allowed.');
+        btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_upload</span> SUBMIT FOR APPROVAL`;
+        btn.disabled = false;
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('Duplicate check skipped:', e.message);
+  }
+
+  btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> SUBMITTING...`;
   try {
     const response = await fetch(SUBMIT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
     const result = await response.json();

@@ -342,6 +342,14 @@ app.put('/api/approve', (req, res) => {
   });
 });
 
+// GET /api/check-job-id — returns all JOB IDs from PENDING and DATABASE
+app.get('/api/check-job-id', (req, res) => {
+  const pendingIds = PENDING_SHEET.slice(1).map(r => (r[1] || '').trim().toUpperCase()).filter(Boolean);
+  const dbIds = DATABASE_SHEET.slice(1).map(r => (r[1] || '').trim().toUpperCase()).filter(Boolean);
+  const allIds = [...new Set([...pendingIds, ...dbIds])];
+  return res.json({ success: true, pendingIds, dbIds, allIds });
+});
+
 // ── Deprecated /api/submit — reject old cached frontends ─────────────────────
 app.all('/api/submit', (req, res) => {
   res.status(410).json({ success: false, error: 'Deprecated. Please refresh your browser.' });
