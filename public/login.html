@@ -160,13 +160,25 @@ form.addEventListener('submit', async (e) => {
   loginBtn.disabled = true;
 
   try {
+    console.log('Sending login request to:', LOGIN_URL);
     const response = await fetch(LOGIN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
 
-    const result = await response.json();
+    console.log('Login response status:', response.status);
+    const contentType = response.headers.get('content-type') || '';
+    let result;
+
+    if (contentType.includes('application/json')) {
+      result = await response.json();
+    } else {
+      const errorText = await response.text();
+      console.error('Non-JSON response received from login endpoint:', errorText);
+      showError(`Server Error (${response.status}): ${errorText.substring(0, 150) || 'Check Vercel logs'}`);
+      return;
+    }
 
     if (result.success) {
       localStorage.setItem('session', JSON.stringify({
@@ -180,7 +192,8 @@ form.addEventListener('submit', async (e) => {
       showError(result.error || 'Invalid credentials. Please try again.');
     }
   } catch (err) {
-    showError('Network error. Check your connection.');
+    console.error('Login request failed:', err);
+    showError(`Network/Client Error: ${err.message || 'Check your connection.'}`);
   } finally {
     loginBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">login</span> SIGN IN`;
     loginBtn.disabled = false;

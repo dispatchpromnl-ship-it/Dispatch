@@ -603,6 +603,25 @@ function showToast(type, message) {
 }
 
 // ══════════════════════════════════════════════════════════════
+// SAFE FETCH HELPER
+// ══════════════════════════════════════════════════════════════
+async function safeFetchJson(url, options = {}) {
+  try {
+    const res = await fetch(url, options);
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await res.text();
+      console.error(`Non-JSON response from ${url}:`, text);
+      throw new Error(`Server Error (${res.status}): ${text.substring(0, 100) || 'Unknown error'}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.error(`Fetch failed for ${url}:`, err);
+    throw err;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 // CONNECTION CHECK
 // ══════════════════════════════════════════════════════════════
 async function checkConnection() {
@@ -661,8 +680,7 @@ async function submitForm() {
   btn.disabled = true;
 
   try {
-    const checkResp = await fetch('/api/approve');
-    const checkData = await checkResp.json();
+    const checkData = await safeFetchJson('/api/approve');
     if (checkData.success && checkData.requests) {
       const pendingIds = checkData.requests.map(r => (r.jobId || '').trim().toUpperCase()).filter(Boolean);
       if (pendingIds.includes(formData.job_id.trim().toUpperCase())) {
@@ -678,8 +696,7 @@ async function submitForm() {
 
   btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> SUBMITTING...`;
   try {
-    const response = await fetch(SUBMIT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
-    const result = await response.json();
+    const result = await safeFetchJson(SUBMIT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
     if (result.success) {
       showToast('success', 'Request submitted for admin approval!');
       addOperationEntry(formData.job_id || 'REQ-NEW', 'Pending Approval');
@@ -734,11 +751,10 @@ function renderRequestCard(r, isPending) {
 
 async function approveRequest(row) {
   try {
-    const res = await fetch(SUBMIT_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, action: 'approve', reviewedBy: session.username }) });
-    const data = await res.json();
+    const data = await safeFetchJson(SUBMIT_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, action: 'approve', reviewedBy: session.username }) });
     if (data.success) { showToast('success', 'Request approved and synced to database.'); loadPending(); }
     else showToast('error', data.error);
-  } catch { showToast('error', 'Network error.'); }
+  } catch (err) { showToast('error', err.message || 'Network error.'); }
 }
 
 function openRejectModal(row) { currentRejectRow = row; document.getElementById('rejectRemarks').value = ''; document.getElementById('rejectModal').classList.remove('hidden'); }
@@ -747,11 +763,10 @@ async function confirmReject() {
   const remarks = document.getElementById('rejectRemarks').value.trim();
   if (!remarks) { alert('Please provide a reason.'); return; }
   try {
-    const res = await fetch(SUBMIT_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: currentRejectRow, action: 'reject', remarks, reviewedBy: session.username }) });
-    const data = await res.json();
+    const data = await safeFetchJson(SUBMIT_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: currentRejectRow, action: 'reject', remarks, reviewedBy: session.username }) });
     if (data.success) { showToast('success', 'Request rejected.'); closeRejectModal(); loadPending(); }
     else showToast('error', data.error);
-  } catch { showToast('error', 'Network error.'); }
+  } catch (err) { showToast('error', err.message || 'Network error.'); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -760,32 +775,29 @@ async function confirmReject() {
 async function loadUsers() {
   const tbody = document.getElementById('usersTableBody');
   try {
-    const res = await fetch(USERS_URL);
-    const data = await res.json();
+    const data = await safeFetchJson(USERS_URL);
     if (!data.success || data.users.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant">No users found.</td></tr>'; return; }
     tbody.innerHTML = data.users.map(u => `<tr class="border-b border-outline-variant hover:bg-surface-container-low"><td class="px-4 py-3 font-medium">${u.username}</td><td class="px-4 py-3" id="dn-${u.row}">${u.displayName}</td><td class="px-4 py-3"><span class="px-2 py-0.5 text-[10px] font-bold uppercase ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${u.role}</span></td><td class="px-4 py-3"><span class="px-2 py-0.5 text-[10px] font-bold uppercase ${u.active === 'YES' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${u.active === 'YES' ? 'Active' : 'Inactive'}</span></td><td class="px-4 py-3"><div class="flex gap-1 flex-wrap"><button onclick="openEditNameModal(${u.row}, '${u.username}', '${(u.displayName || '').replace(/'/g, "\\'")}')" class="text-[10px] px-2 py-1 border border-outline-variant hover:bg-surface-container-high transition-colors">EDIT NAME</button><button onclick="toggleUserActive(${u.row}, '${u.active}')" class="text-[10px] px-2 py-1 border border-outline-variant hover:bg-surface-container-high transition-colors">${u.active === 'YES' ? 'DEACTIVATE' : 'ACTIVATE'}</button><button onclick="resetPassword(${u.row}, '${u.username}')" class="text-[10px] px-2 py-1 border border-outline-variant hover:bg-surface-container-high transition-colors">RESET PASS</button></div></td></tr>`).join('');
-  } catch { tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-red-500">Error loading users.</td></tr>'; }
+  } catch (err) { tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-red-500">Error loading users: ${err.message || 'Unknown error'}</td></tr>`; }
 }
 
 async function toggleUserActive(row, currentActive) {
   const newActive = currentActive === 'YES' ? 'NO' : 'YES';
   try {
-    const res = await fetch(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, active: newActive }) });
-    const data = await res.json();
+    const data = await safeFetchJson(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, active: newActive }) });
     if (data.success) { showToast('success', 'User ' + (newActive === 'YES' ? 'activated' : 'deactivated') + '.'); loadUsers(); }
     else showToast('error', data.error);
-  } catch { showToast('error', 'Network error.'); }
+  } catch (err) { showToast('error', err.message || 'Network error.'); }
 }
 
 async function resetPassword(row, username) {
   const newPass = prompt('Enter new password for ' + username + ':');
   if (!newPass || newPass.length < 4) { if (newPass !== null) alert('Min 4 characters.'); return; }
   try {
-    const res = await fetch(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, password: newPass }) });
-    const data = await res.json();
+    const data = await safeFetchJson(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, password: newPass }) });
     if (data.success) showToast('success', 'Password reset.');
     else showToast('error', data.error);
-  } catch { showToast('error', 'Network error.'); }
+  } catch (err) { showToast('error', err.message || 'Network error.'); }
 }
 
 let editNameRow = null;
@@ -803,11 +815,10 @@ async function saveEditName() {
   const btn = document.getElementById('saveEditNameBtn');
   btn.textContent = 'SAVING...'; btn.disabled = true;
   try {
-    const res = await fetch(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: editNameRow, displayName: newName }) });
-    const data = await res.json();
+    const data = await safeFetchJson(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: editNameRow, displayName: newName }) });
     if (data.success) { showToast('success', 'Display name updated.'); closeEditNameModal(); loadUsers(); }
     else showToast('error', data.error);
-  } catch { showToast('error', 'Network error.'); }
+  } catch (err) { showToast('error', err.message || 'Network error.'); }
   finally { btn.textContent = 'SAVE'; btn.disabled = false; }
 }
 
@@ -819,11 +830,10 @@ document.getElementById('addUserForm').addEventListener('submit', async (e) => {
   const errEl = document.getElementById('addUserError'); errEl.classList.add('hidden');
   const btn = document.getElementById('addUserBtn'); btn.textContent = 'ADDING...'; btn.disabled = true;
   try {
-    const res = await fetch(USERS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: document.getElementById('newUsername').value.trim(), password: document.getElementById('newPassword').value, displayName: document.getElementById('newDisplayName').value.trim(), role: document.getElementById('newRole').value }) });
-    const data = await res.json();
+    const data = await safeFetchJson(USERS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: document.getElementById('newUsername').value.trim(), password: document.getElementById('newPassword').value, displayName: document.getElementById('newDisplayName').value.trim(), role: document.getElementById('newRole').value }) });
     if (data.success) { showToast('success', 'User added.'); closeAddUserModal(); loadUsers(); }
     else { errEl.textContent = data.error; errEl.classList.remove('hidden'); }
-  } catch { errEl.textContent = 'Network error.'; errEl.classList.remove('hidden'); }
+  } catch (err) { errEl.textContent = err.message || 'Network error.'; errEl.classList.remove('hidden'); }
   finally { btn.textContent = 'ADD USER'; btn.disabled = false; }
 });
 
@@ -837,16 +847,15 @@ async function loadAuditLog() {
   const tbody = document.getElementById('auditTableBody');
   tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant">Loading...</td></tr>';
   try {
-    const res = await fetch(AUDIT_URL);
-    const data = await res.json();
+    const data = await safeFetchJson(AUDIT_URL);
     if (!data.success || data.logs.length === 0) {
       tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant">No audit logs yet.</td></tr>';
       return;
     }
     allAuditLogs = data.logs;
     renderAuditLogs(allAuditLogs);
-  } catch {
-    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-red-500">Error loading audit log.</td></tr>';
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-red-500">Error loading audit log: ${err.message || 'Unknown error'}</td></tr>`;
   }
 }
 
@@ -906,15 +915,16 @@ themeToggleBtn.addEventListener('click', () => {
 if (isAdmin) {
   (async () => {
     try {
-      const res = await fetch(SUBMIT_URL);
-      const data = await res.json();
+      const data = await safeFetchJson(SUBMIT_URL);
       if (data.success) {
         const count = data.requests.filter(r => r.status === 'PENDING').length;
         const badge = document.getElementById('pendingBadge');
         badge.textContent = count;
         badge.classList.toggle('hidden', count === 0);
       }
-    } catch {}
+    } catch (err) {
+      console.error('Failed to load pending badge count:', err);
+    }
   })();
 }
 </script>

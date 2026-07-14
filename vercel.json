@@ -18,7 +18,8 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/((?!api/).*\\.html)", "destination": "/$1" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/login.html", "destination": "/public/login.html" },
+    { "source": "/agx-logo.png", "destination": "/public/agx-logo.png" },
+    { "source": "/((?!api/).*)", "destination": "/public/index.html" }
   ]
 }
