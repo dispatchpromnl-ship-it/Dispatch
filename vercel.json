@@ -16,10 +16,9 @@
       ]
     }
   ],
+  "outputDirectory": "public",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/login.html", "destination": "/public/login.html" },
-    { "source": "/agx-logo.png", "destination": "/public/agx-logo.png" },
-    { "source": "/((?!api/).*)", "destination": "/public/index.html" }
+    { "source": "/api/:path*", "destination": "/api/:path*" },
+    { "source": "/((?!api).*)", "destination": "/index.html" }
   ]
 }
