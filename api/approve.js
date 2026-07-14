@@ -138,6 +138,30 @@ module.exports = async function handler(req, res) {
         return key && data[key] !== undefined ? String(data[key]) : '';
       });
 
+      // ── Check for duplicate JOB ID in PENDING and DATABASE ──────────────
+      const jobId = data.job_id || '';
+      if (jobId) {
+        const [pendingRes, dbRes] = await Promise.all([
+          sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID, range: `${PENDING_SHEET}!B2:B`,
+          }).catch(() => ({ data: { values: [] } })),
+          sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID, range: `${DATABASE_SHEET}!B2:B`,
+          }).catch(() => ({ data: { values: [] } })),
+        ]);
+
+        const pendingIds = (pendingRes.data.values || []).map(r => (r[0] || '').trim().toUpperCase());
+        const dbIds = (dbRes.data.values || []).map(r => (r[0] || '').trim().toUpperCase());
+        const allIds = [...pendingIds, ...dbIds];
+
+        if (allIds.includes(jobId.trim().toUpperCase())) {
+          return res.status(409).json({
+            success: false,
+            error: `Job ID "${jobId}" already exists. Duplicate entries are not allowed.`,
+          });
+        }
+      }
+
       // Ensure headers exist
       const existing = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,

@@ -256,6 +256,20 @@ app.post('/api/approve', (req, res) => {
     return key && data[key] !== undefined ? String(data[key]) : '';
   });
 
+  // ── Check for duplicate JOB ID in PENDING and DATABASE ──────────────
+  const jobId = (data.job_id || '').trim().toUpperCase();
+  if (jobId) {
+    const pendingIds = PENDING_SHEET.slice(1).map(r => (r[1] || '').trim().toUpperCase());
+    const dbIds = DATABASE_SHEET.slice(1).map(r => (r[1] || '').trim().toUpperCase());
+
+    if (pendingIds.includes(jobId) || dbIds.includes(jobId)) {
+      return res.status(409).json({
+        success: false,
+        error: `Job ID "${data.job_id}" already exists. Duplicate entries are not allowed.`,
+      });
+    }
+  }
+
   PENDING_SHEET.push(row);
   pendingCounter++;
 
