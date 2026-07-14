@@ -661,11 +661,12 @@ async function submitForm() {
   btn.disabled = true;
 
   try {
-    const checkResp = await fetch('/api/check-job-id');
+    const checkResp = await fetch('/api/approve');
     const checkData = await checkResp.json();
-    if (checkData.success && checkData.allIds) {
-      if (checkData.allIds.includes(formData.job_id.trim().toUpperCase())) {
-        showToast('error', 'Job ID "' + formData.job_id + '" already exists in the system. Duplicate entries are not allowed.');
+    if (checkData.success && checkData.requests) {
+      const pendingIds = checkData.requests.map(r => (r.jobId || '').trim().toUpperCase()).filter(Boolean);
+      if (pendingIds.includes(formData.job_id.trim().toUpperCase())) {
+        showToast('error', 'Job ID "' + formData.job_id + '" already exists in pending requests. Duplicate entries are not allowed.');
         btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_upload</span> SUBMIT FOR APPROVAL`;
         btn.disabled = false;
         return;
