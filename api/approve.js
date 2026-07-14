@@ -195,8 +195,8 @@ module.exports = async function handler(req, res) {
       });
 
       // Log audit
-      const jobId = data.job_id || 'N/A';
-      await writeAuditLog('REQUEST_SUBMITTED', submittedBy, `Job ID: ${jobId} | ${data.particulars || ''} | ₱${data.amount_2 || '0'}`, '');
+      const auditJobId = data.job_id || 'N/A';
+      await writeAuditLog('REQUEST_SUBMITTED', submittedBy, `Job ID: ${auditJobId} | ${data.particulars || ''} | ₱${data.amount_2 || '0'}`, '');
 
       return res.status(200).json({ success: true, message: 'Request submitted for approval.' });
     }
