@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light'); }
+    else { document.documentElement.classList.add('light'); document.documentElement.classList.remove('dark'); }
+  })();
+</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ALWEN DISPATCHER PRO</title>
+<meta name="theme-color" content="#00488d"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "on-secondary-fixed": "#071e27",
+        "on-error-container": "#93000a",
+        "error": "#ba1a1a",
+        "tertiary-fixed-dim": "#c6c6c7",
+        "tertiary-container": "#5f6060",
+        "surface-container-low": "var(--color-surface-container-low)",
+        "secondary": "#4c616c",
+        "on-primary": "var(--color-on-primary)",
+        "on-primary-fixed-variant": "#00468b",
+        "outline-variant": "var(--color-outline-variant)",
+        "outline": "var(--color-outline)",
+        "primary-fixed-dim": "#a8c8ff",
+        "on-secondary-fixed-variant": "#354a53",
+        "inverse-primary": "#a8c8ff",
+        "on-primary-fixed": "var(--color-on-primary-fixed)",
+        "primary-fixed": "var(--color-primary-fixed)",
+        "surface-container": "var(--color-surface-container)",
+        "on-surface": "var(--color-on-surface)",
+        "inverse-on-surface": "var(--color-inverse-on-surface)",
+        "inverse-surface": "var(--color-inverse-surface)",
+        "on-secondary": "#ffffff",
+        "on-tertiary-container": "#dbdbdb",
+        "on-tertiary-fixed": "#1a1c1c",
+        "primary-container": "var(--color-primary-container)",
+        "secondary-container": "var(--color-secondary-container)",
+        "secondary-fixed-dim": "#b4cad6",
+        "on-tertiary-fixed-variant": "#454747",
+        "tertiary": "#474849",
+        "surface-variant": "#e5e2e1",
+        "on-primary-container": "var(--color-on-primary-container)",
+        "tertiary-fixed": "#e2e2e2",
+        "on-background": "var(--color-on-surface)",
+        "surface-bright": "var(--color-surface)",
+        "background": "var(--color-background)",
+        "surface-container-high": "var(--color-surface-container-high)",
+        "surface-dim": "var(--color-surface-dim)",
+        "surface-tint": "#005db5",
+        "surface": "var(--color-surface)",
+        "on-error": "#ffffff",
+        "error-container": "#ffdad6",
+        "secondary-fixed": "#cfe6f2",
+        "on-tertiary": "#ffffff",
+        "on-secondary-container": "var(--color-on-secondary-container)",
+        "primary": "var(--color-primary)",
+        "surface-container-lowest": "var(--color-surface-container-lowest)",
+        "surface-container-highest": "var(--color-surface-container-highest)",
+        "on-surface-variant": "var(--color-on-surface-variant)"
+      },
+      "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+      "spacing": { "md": "16px", "sm": "8px", "unit": "4px", "xs": "4px", "gutter": "12px", "form-gap": "20px", "xl": "32px", "lg": "24px" },
+      "fontFamily": { "headline-md": ["Inter"], "body-md": ["Inter"], "button-text": ["Inter"], "headline-lg": ["Inter"], "label-caps": ["Inter"], "input-text": ["Inter"] },
+      "fontSize": {
+        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "button-text": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+        "input-text": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+      }
+    },
+  },
+}
+</script>
+<style>
+:root, html.light {
+  --color-primary: #00488d; --color-on-primary: #ffffff; --color-primary-container: #005fb8; --color-on-primary-container: #cadcff;
+  --color-primary-fixed: #d6e3ff; --color-on-primary-fixed: #001b3d; --color-surface: #fcf9f8; --color-on-surface: #1b1b1b;
+  --color-surface-dim: #dcd9d9; --color-surface-container-low: #f6f3f2; --color-surface-container: #f0eded;
+  --color-surface-container-high: #eae7e7; --color-surface-container-highest: #e5e2e1; --color-surface-container-lowest: #ffffff;
+  --color-on-surface-variant: #424752; --color-outline: #727783; --color-outline-variant: #c2c6d4; --color-background: #fcf9f8;
+  --color-secondary-container: #cfe6f2; --color-on-secondary-container: #526772; --color-inverse-surface: #313030;
+  --color-inverse-on-surface: #f3f0ef; --color-app-bg: #F3F3F3;
+}
+html.dark {
+  --color-primary: #a8c8ff; --color-on-primary: #003062; --color-primary-container: #00468b; --color-on-primary-container: #d6e3ff;
+  --color-primary-fixed: #00468b; --color-on-primary-fixed: #d6e3ff; --color-surface: #121318; --color-on-surface: #e2e2e9;
+  --color-surface-dim: #1a1c22; --color-surface-container-low: #1a1c22; --color-surface-container: #1e2027;
+  --color-surface-container-high: #2a2c34; --color-surface-container-highest: #33353c; --color-surface-container-lowest: #14161a;
+  --color-on-surface-variant: #a2a7b4; --color-outline: #8c919e; --color-outline-variant: #424752; --color-background: #121318;
+  --color-secondary-container: #334856; --color-on-secondary-container: #cfe6f2; --color-inverse-surface: #f3f0ef;
+  --color-inverse-on-surface: #1b1b1b; --color-app-bg: #0c0d12;
+}
+body { background-color: var(--color-app-bg); color: var(--color-on-surface); font-family: 'Inter', sans-serif; transition: background-color 0.2s ease, color 0.2s ease; }
+header, aside, main, div, button, input, select, textarea, a, h1, h2, p, span { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+.dark .bg-white { background-color: var(--color-surface-container-lowest) !important; }
+.dark .bg-\[\#F3F3F3\] { background-color: var(--color-app-bg) !important; }
+.dark input, .dark select, .dark textarea { background-color: var(--color-surface-container-lowest) !important; color: var(--color-on-surface) !important; border-color: var(--color-outline-variant) !important; }
+.dark input:focus, .dark select:focus, .dark textarea:focus { border-color: var(--color-primary) !important; --tw-ring-color: var(--color-primary) !important; }
+.dark label { color: var(--color-on-surface-variant) !important; }
+.dark select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a2a7b4' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important; }
+.dark #operationsFeed div { background-color: var(--color-surface-container-low) !important; border-color: var(--color-outline-variant) !important; }
+.dark #operationsFeed div p { color: var(--color-on-surface) !important; }
+.dark #operationsFeed div p.text-on-surface-variant { color: var(--color-on-surface-variant) !important; }
+.dark #operationsFeed div .bg-green-100 { background-color: #064e3b !important; }
+.dark #operationsFeed div .text-green-700 { color: #34d399 !important; }
+.form-input-caps { text-transform: uppercase; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+.dark ::-webkit-scrollbar-track { background: #1b1c21; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb { background: #424656; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #5d6278; }
+#sidebarOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 35; opacity: 0; transition: opacity 0.3s ease; }
+#sidebarOverlay.active { display: block; opacity: 1; }
+@media (max-width: 767px) {
+  #sidebar { transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+  #sidebar.open { transform: translateX(0); }
+  #mainContent { margin-left: 0 !important; }
+}
+.nav-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 0.5rem; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.15s; color: var(--color-on-surface-variant); }
+.nav-item:hover { background-color: var(--color-surface-container-high); }
+.nav-item.active { background-color: var(--color-primary-container); color: var(--color-on-primary-container); }
+</style>
+</head>
+<body class="overflow-x-hidden">
+
+<!-- Top Navigation Bar -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center px-4 md:px-lg h-16 w-full fixed top-0 z-50">
+  <div class="flex items-center gap-sm">
+    <button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer md:hidden" id="menuBtn" aria-label="Toggle menu">menu</button>
+    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">assignment_turned_in</span>
+    <h1 class="font-headline-lg text-headline-lg text-primary hidden sm:block" id="headerTitle">ONLINE REQUEST FORM</h1>
+    <h1 class="font-headline-lg text-[16px] font-semibold text-primary sm:hidden" id="headerTitleSm">REQUEST FORM</h1>
+  </div>
+  <div class="flex items-center gap-md">
+    <div class="h-12 flex items-center justify-center bg-white px-3 py-1 rounded border border-outline-variant shadow-sm">
+      <img src="./agx-logo.png" alt="AGX Logo" class="h-10 object-contain" />
+    </div>
+    <button id="themeToggleBtn" class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80" aria-label="Toggle Theme">dark_mode</button>
+  </div>
+</header>
+
+<div id="sidebarOverlay"></div>
+
+<!-- Sidebar Navigation -->
+<aside class="bg-surface-container-low border-r border-outline-variant flex flex-col fixed left-0 top-0 h-full w-64 z-40 pt-16" id="sidebar">
+  <div class="px-lg py-md mb-md">
+    <h2 class="font-headline-md text-headline-md text-on-surface">ALWEN DISPATCHER PRO</h2>
+    <p class="text-xs font-label-caps text-on-surface-variant opacity-70 uppercase">Enterprise Logistics</p>
+  </div>
+  <nav class="flex-1 px-sm space-y-1">
+    <div class="nav-item active" onclick="switchTab('form')" id="navForm">
+      <span class="material-symbols-outlined">assignment</span>
+      <span>New Request</span>
+    </div>
+    <div class="nav-item hidden" onclick="switchTab('pending')" id="navPending">
+      <span class="material-symbols-outlined">pending_actions</span>
+      <span>Pending Approvals</span>
+      <span class="ml-auto bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold hidden" id="pendingBadge">0</span>
+    </div>
+    <div class="nav-item hidden" onclick="switchTab('users')" id="navUsers">
+      <span class="material-symbols-outlined">group</span>
+      <span>Manage Users</span>
+    </div>
+    <div class="nav-item hidden" onclick="switchTab('audit')" id="navAudit">
+      <span class="material-symbols-outlined">history</span>
+      <span>Audit Trail</span>
+    </div>
+  </nav>
+  <div class="p-md mt-auto">
+    <div class="flex items-center gap-sm bg-surface-container-high p-sm rounded-lg border border-outline-variant">
+      <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+        <span class="material-symbols-outlined text-on-primary-fixed">person</span>
+      </div>
+      <div class="flex-1 overflow-hidden">
+        <p class="text-xs font-bold truncate" id="sidebarUsername">Loading...</p>
+        <p class="text-[10px] text-on-surface-variant" id="sidebarRole">...</p>
+      </div>
+      <button onclick="logout()" class="material-symbols-outlined text-on-surface-variant hover:text-red-600 transition-colors text-[18px] p-1" title="Logout">logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content Area -->
+<main class="md:ml-64 pt-16 min-h-screen bg-[#F3F3F3]" id="mainContent">
+  <div class="max-w-5xl mx-auto p-4 md:p-xl">
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- TAB: NEW REQUEST FORM (visible to all)                     -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <div id="tabForm">
+      <div class="mb-lg flex flex-col sm:flex-row justify-between sm:items-end gap-2">
+        <div>
+          <h2 class="font-headline-md text-headline-md text-on-surface mb-xs">New Logistics Request</h2>
+          <p class="text-xs font-label-caps text-on-surface-variant flex items-center gap-xs">
+            <span class="material-symbols-outlined text-[14px]">info</span>
+            NOTE: DATA ENTRY ALL CAPS
+          </p>
+        </div>
+        <div class="text-xs text-on-surface-variant bg-surface-container-high px-sm py-1 border border-outline-variant w-fit">
+          STATUS: <span class="font-mono" id="connectionStatus">CHECKING...</span>
+        </div>
+      </div>
+
+      <div class="bg-white border border-outline-variant shadow-sm p-4 md:p-xl">
+        <form class="space-y-form-gap" id="requestForm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-xl gap-y-form-gap">
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="date_requested">DATE REQUESTED</label>
+              <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="date_requested" name="date_requested" type="date"/>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="job_id">JOB ID</label>
+              <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="job_id" name="job_id" placeholder="ENTER JOB ID" type="text"/>
+            </div>
+            <div class="md:col-span-2 flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="particulars">PARTICULARS</label>
+              <select class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="particulars" name="particulars">
+                <option value="" disabled selected>SELECT PARTICULARS</option>
+                <option>-</option>
+                <option>ALLOWANCES</option><option>BREAKBULK INSPECTION</option><option>BROKER FEE &amp; PORT CHARGES</option><option>BROKERAGE &amp; PORT</option><option>BUSINESS PERMIT</option><option>CDEC EIP/AEDS</option><option>CDEC FUNDING</option><option>CONDEP</option><option>CONDEP REFUND</option><option>CONTAINER DEPOSIT</option><option>CONTAINER REFUND</option><option>CONTRACTOR</option><option>CTF</option><option>CTF / CUSTOMS</option><option>DELIVERY CHARGE</option><option>DEMURRAGE CHARGE</option><option>DETENTION</option><option>DETENTION CHARGE/ORIGIN CHARGE</option><option>DETENTION CHARGES</option><option>DUTIES &amp; TAXES</option><option>EKONEK EIP</option><option>EKONEK VASP</option><option>ENCASHMENT</option><option>ETRACC</option><option>EZTS</option><option>FABRICATION</option><option>FORKLIFT RENTAL</option><option>FRANCHISE FEE</option><option>FREIGHT&amp;LIFT ON/OFF CHARGES</option><option>INSTALLATION OF SIGNAGES</option><option>INTERCOMMERCE VASP</option><option>INTERCOMMER FUNDING</option><option>LATE DELIVERY ORDER FEE</option><option>LOCAL</option><option>LOCAL &amp; CONDEP</option><option>LOCAL CHARGE</option><option>LOCAL CHARGE &amp; CONDEP</option><option>LOCAL CHARGES</option><option>MANIFEST &amp; TURNOVER FEE</option><option>OCEAN FREIGHT</option><option>ORIGIN CHARGE</option><option>ORIGIN CHARGES &amp; OCEAN FREIGHT</option><option>ORGIN CHARGE</option><option>PCF REPLENISHMENT</option><option>PERSONAL</option><option>PORT CHARGES</option><option>PROCESSING</option><option>PROCESSING &amp; PORT CHARGES</option><option>PTOPS IT FEE</option><option>RACKING INSTALLMENT</option><option>RENEWAL FEE FOR SURETY INSURANCE BOND</option><option>REPLENISHMENT</option><option>SMARTLINK PRE-ADVCE</option><option>SPONSORSHIP</option><option>STORAGE</option><option>STORAGE FEE</option><option>STRUCTURAL ANALYSIS</option><option>SURVEY REPORT CHARGE</option><option>TRUCKING CHARGE</option><option>TURNOVER</option><option>TURNOVER FEE</option><option>WAREHOUSE RENTAL</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="consignee">CONSIGNEE</label>
+              <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="consignee" name="consignee" placeholder="RECEIVING PARTY" type="text"/>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="mbl">MBL (MASTER BILL OF LADING)</label>
+              <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="mbl" name="mbl" placeholder="MBL NUMBER" type="text"/>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="hbl">HBL (HOUSE BILL OF LADING)</label>
+              <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="hbl" name="hbl" placeholder="HBL NUMBER" type="text"/>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="container_number">CONTAINER NUMBER</label>
+              <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="container_number" name="container_number" placeholder="E.G. ABCD1234567" type="text"/>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="account_no">ACCOUNT NO.</label>
+              <input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="account_no" name="account_no" placeholder="ACCOUNT NUMBER" type="text"/>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="requested_by">REQUESTED BY</label>
+              <input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="requested_by" name="requested_by" placeholder="PERSONNEL NAME" type="text"/>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="supplier_name">SUPPLIER'S NAME</label>
+              <select class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="supplier_name" name="supplier_name">
+                <option value="" disabled selected>SELECT SUPPLIER</option>
+                <option>ABDULMUGNIE A. ACMAD</option><option>AFFOGATO CORP.</option><option>AGX GLOBAL EXPRESS INC.</option><option>AMYHR HUSSIEN MANALAO DOMADO</option><option>APL CO PTE LTD</option><option>ASCENT SOLUTIONS PHILIPPINES INC.</option><option>ASIAN CONSOLIDATION INT'L SERVICES INC.</option><option>ASIAN CONSOLIDATION INT'L SERVICES INC. NEW</option><option>ASIAEVOLUTION INC.</option><option>AUTOLIV CEBU SAFETY MANUFACTURING, INC.</option><option>AWARDS CARGO AGENCY</option><option>AWARDS CARGO AGENCY PHILS., INC.</option><option>BANK OF THE PHILIPPINE ISLANDS</option><option>BANK OF THE PHILIPPINE ISLANDS DVO</option><option>BEN LINE AGENCIES PHILIPPINES, INC.</option><option>BILLY JEO RAMOS</option><option>BOEING MATERIAL HANDLING CORP.</option><option>BRUCE FOSSILSTONES INT'L CORP.</option><option>BRUCE FOSSILSTONES INTERNATIONAL CORPORATION</option><option>BUREAU OF CUSTOMS</option><option>CARGO DATA EXCHANGE CENTER, INC.</option><option>CARGOWORTHY FREIGHT SERVICES INC.</option><option>CEBU MITSUMI INC.</option><option>CHRISTINE ETHEL MENDOZA</option><option>CITIBANK FAO FEDERAL EXPRESS PACIFIC,LLC</option><option>CLIO Shipping and Logistics (Philippines) Inc.</option><option>CMA CGM PHILIPPINES INC.</option><option>CMA CGM PHILIPPINES INC - BDO</option><option>CMA CGM PHILIPPINES INC - HSBC</option><option>COLORSTEEL SYSTEM CORP.</option><option>COMPOSTELA STEEL</option><option>CONSOLATRIX TRUCKING SERVICES</option><option>CONTAINER LEDGER ACCOUNT PHILS., INC.</option><option>COSONSA MANUFACTURING INC.</option><option>COSCO SHIPPING LINES (PHILIPPINES) INC.</option><option>COTECNA ELITE PHILIPPINES INC.</option><option>COTS FREIGHT INTERNATIONAL, INC.</option><option>COTS FREIGHT INTERNATIONAL, INC.1</option><option>CREST FORWARDER INC.</option><option>DENNIS INTERNATIONAL MERCHANDISING INC</option><option>EAGLE EXPRESS LINES INC.</option><option>EAGLE EXPRESS LINES INC. 2</option><option>EAST LINE CEBU INC</option><option>EAST LINE CEBU INC.</option><option>ECU WORLDWIDE (PHILIPPINES) INC.</option><option>EFE INDUSTRIAL SOLUTION INC</option><option>EHNCOR FREIGHT SERVICES INC.</option><option>EKONEK PILIPINA INC.</option><option>EVERGREEN LOGISTICS PHILIPPINES CORPORATION</option><option>EVERGREEN SHIPPING AGENCY</option><option>EVERGREEN SHIPPING AGENCY - DAVAO</option><option>EVERGREEN SHIPPING AGENCY PHILS., CORP.</option><option>EVERGREEN SHIPPING AGENCY PHILIPPINES CORPORATION</option><option>EVERGREEN SHIPPING UBP</option><option>EXPEDITORS PHILIPPINES, INC.</option><option>EYE CARGO LOGISTICS INC</option><option>FOX LOGISTICS PHILS. INC.</option><option>FTZ SOLUTIONS INC</option><option>G&amp;P GLOBAL PACIFIC INTERNATIONAL FREIGHT LOGISTICS, INC.</option><option>GEOJET LOGISTICS SERVICES INC.</option><option>GLI-GLOBAL IMPEX CONSOLIDATION, INC.</option><option>GLOBELINK NVOCC PHILS., INC.</option><option>GOLDEN ARROW TRUCKING SERVICES</option><option>GTI LOGISTICS CORPORATION</option><option>HAMDANEE AMEROL</option><option>HAZEL BIANCA REMEDIO</option><option>HSBC FAO CMA CGM PHILIPPINES, INC - CNC</option><option>HSBC FAO OCEAN NETWORK EXPRESS</option><option>INTERCOMMERCE NETWORK SERVICE</option><option>INTERNATIONAL ELEVATOR &amp; EQUIPMENT, INC.</option><option>JAKE TERRENCE EGUNA</option><option>JAMES CONLU</option><option>JENNY JOY GRANADA</option><option>JOSE ALWEN RODRIGUEZ</option><option>JUGRO TRANSPORT INT'L. PHILS. CORP.</option><option>JULIUS CEAZAR JARDIN</option><option>K5 PLUS LOGISTICS CORPORATION</option><option>KARGOSMART GLOBAL CORP.</option><option>KRISTIE ANO-OS</option><option>LBP CEBU BOC BRANCH IFO BOC FAO ARIE CEBU COSMETIC CORP</option><option>LBP CEBU BOC BRANCH IFO BOC FAO AUTOLIV CEBU SAFETY MANUFACTURING INC.</option><option>LBP CEBU BOC BRANCH IFO BOC FAO CEBU MITSUMI INC.</option><option>LIBERTY INSURANCE CORP.</option><option>LUISA EVELYN GO</option><option>MAC XAVIER LOGISTICS</option><option>MAC-NELS LINE INC.</option><option>MAC-NELS LINE INC. 2</option><option>MAERSK FILIPINAS, INC.</option><option>MANDAUE CITY TREASURER</option><option>MANILA ADJUSTERS AND SURVEYORS COMPANY</option><option>MARIA SALOME ARESCO</option><option>MARICEL T. MUSTAPHA</option><option>MATTNICK (MN) CONTAINER LINES INC.</option><option>MCC TRANSPORT PHILIPPINES INC</option><option>MEPZ-PMA</option><option>MERCURY FREIGHT INTERNATIONAL INC</option><option>MICHAEL ANGELO TORRES YUSON</option><option>MIGENLOGISTICS CORPORATION</option><option>MINDANAO ICTSI</option><option>MINDANAO ICTSI 1</option><option>MIROLA HAMOY</option><option>MOL LOGISTICS PHILIPPINES INC.</option><option>MONIC GABUYA</option><option>MSTAR SHIP AGENCIES INC.</option><option>MYEG PHILIPPINES</option><option>NISSIN TRANSPORT PHILIPPINES CORPORATION</option><option>NNR GLOBAL LOGISTICS (PHILS.) INC.</option><option>NNR GLOBAL LOGISTICS (PHILIPPINES) INC.</option><option>OCEAN NETWORK EXPRESS</option><option>OCEAN NETWORK EXPRESS PHILS., INC.</option><option>OCEAN NETWORK EXPRESS PHILS., INC. 1</option><option>OCEAN NETWORK EXPRESS PHILS., INC. - CONDEP</option><option>ONE GLOBAL LOGISTICS CORP.</option><option>ONE NETWORK EXPRESS PHILIPPINES INC - LINER</option><option>ONE WORLD LOGISTICS CEBU INC</option><option>OOCL PHILS INC.</option><option>PACIFIC CONCORD CONTAINER LINES, INC.</option><option>PAUL JOHN OSWA</option><option>PAUL JOHN OSWA / ENCASHMENT</option><option>PENANSHIN SHIPPING PHILS., INC.</option><option>PHIL WORLD FREIGHT FORWARDING INC</option><option>PHILIPPINES LIGHT-LEATHER INC.</option><option>PLAS ENTERPRISES &amp; ENGINEERING SERVICES</option><option>PORT NET LOGISTICS INC</option><option>PROLINE LOGISTIC PHILIPPINES INC</option><option>PROLINE LOGISTICS PHILIPPINES INC.</option><option>PTOPS</option><option>PWL PRESTIGE WAREHOUSING</option><option>PWL PRESTIGE WAREHOUSING &amp; LOGISTICS INC.</option><option>RAMONITO MA-ANO</option><option>RAPID INC.</option><option>REMAR F. MANSARI</option><option>REY F. MERANO</option><option>REYMAR LABANON</option><option>RONALD JABAGAT</option><option>RORY S. CUNAN</option><option>RUNSAME ORNOPIO RAPESORA</option><option>RUNSAME RAPESORA</option><option>SEAHAWK TRANSPORT INC.</option><option>SEAHAWK TRANSPORT INC. NEW</option><option>SEALAND MAERSK ASIA PTE LTD</option><option>SHIPCO TRANSPORT PHILIPPINES INC.</option><option>SITC CONTAINER LINES PHILS., INC.</option><option>SITC CONTAINER LINES PHILS., INC. 2</option><option>SOLIDOR TRUCKING SERVICES</option><option>SOUTHLINK GLOBAL LOGISTICS, INC.</option><option>STERLINK FREIGHT INC.</option><option>SWIFT MODAL INT'L LOGISTICS INC.</option><option>TPI GLOBAL FORWARDING</option><option>TOBIAS E. MANALO</option><option>TOMAS D. ALCANTARA</option><option>TRANSCONTAINER (TCL) PHILIPPINES, INC.</option><option>TRANSMODAL INTERNATIONAL INC.</option><option>TRIPLE V WORLDWIDE LOGISTICS INC.</option><option>WAN HAI LINES (PHILS.,) INC.</option><option>WAN HAI LINES (PHILS.,) INC. 2</option><option>WALLEM PHILIPPINES SHIPPING, INC.</option><option>YANG MING SHIPPING PHILS., INC.</option><option>YANG MING SHIPPING PHILS., INC. 2</option><option>YANG MING SHIPPING PHILS., INC. 3</option><option>YANG MING SHIPPING PHILS., INC. 4</option><option>ZIM INTEGRATED SHIPPING SERVICES LTD</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="amount_2">TOTAL AMOUNT</label>
+              <input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="amount_2" name="amount_2" step="0.01" type="number"/>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="bank_name">BANK NAME</label>
+              <select class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="bank_name" name="bank_name">
+                <option value="" disabled selected>SELECT BANK</option>
+                <option value="BDO">BDO - BANCO DE ORO UNIBANK INC.</option><option value="BPI">BPI - BANK OF THE PHILIPPINE ISLANDS</option><option value="CHINA">CHINA - CHINA BANKING CORPORATION</option><option value="CITI">CITI - CITI BANK</option><option value="EW">EW - EAST-WEST BANKING CORPORATION</option><option value="GCASH">GCASH - GCASH-PEZA</option><option value="HSBC">HSBC - HONGKONG AND SHANGHAI BANK</option><option value="LB">LB - LAND BANK</option><option value="MBTC">MBTC - METROPOLITAN BANK AND TRUST CO</option><option value="PNB">PNB - PHILIPPINE NATIONAL BANK</option><option value="PSBANK">PSBANK - PHILIPPINE SAVINGS BANK</option><option value="RCBC">RCBC - RIZAL COMMERCIAL BANKING CORP.</option><option value="SB">SB - SECURITY BANK</option><option value="UB">UB - UNION BANK OF THE PHILIPPINES</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-label-caps text-on-surface-variant" for="payment_status">PAYMENT STATUS</label>
+              <select class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="payment_status" name="payment_status">
+                <option value="">-- SELECT STATUS --</option>
+                <option value="PAID">PAID</option><option value="UNPAID">UNPAID</option><option value="PENDING">PENDING</option><option value="PARTIAL">PARTIAL</option>
+              </select>
+            </div>
+          </div>
+          <div class="pt-xl mt-lg border-t border-[#E5E5E5] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+            <button class="px-lg h-10 border border-[#D1D1D1] text-on-surface-variant font-button-text hover:bg-surface-container transition-colors active:bg-surface-container-high" type="reset">CLEAR FORM</button>
+            <button class="bg-primary text-on-primary px-xl h-10 font-button-text hover:bg-[#003d7a] transition-all flex items-center justify-center gap-sm shadow-md active:scale-95 w-full sm:w-auto" id="submitBtn" type="button">
+              <span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+              SUBMIT FOR APPROVAL
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="mt-lg" id="recentOps">
+        <div class="flex items-center justify-between mb-md">
+          <h3 class="text-xs font-label-caps text-on-surface-variant uppercase">Recent Submissions</h3>
+          <div class="h-px flex-1 mx-md bg-outline-variant opacity-30"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-md" id="operationsFeed">
+          <div class="bg-white border border-outline-variant p-md flex items-center gap-md opacity-50">
+            <div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center">
+              <span class="material-symbols-outlined text-on-surface-variant text-[16px]">info</span>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold">Waiting for submissions...</p>
+              <p class="text-[10px] text-on-surface-variant uppercase">No records yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- TAB: PENDING APPROVALS (admin only)                        -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <div id="tabPending" class="hidden">
+      <div class="mb-lg flex flex-col sm:flex-row justify-between sm:items-end gap-2">
+        <div>
+          <h2 class="font-headline-md text-headline-md text-on-surface mb-xs">Pending Approvals</h2>
+          <p class="text-xs font-label-caps text-on-surface-variant flex items-center gap-xs">
+            <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+            ADMIN ONLY — REVIEW AND APPROVE REQUESTS
+          </p>
+        </div>
+        <button onclick="loadPending()" class="text-xs px-3 py-2 border border-outline-variant hover:bg-surface-container-high transition-colors flex items-center gap-1 w-fit">
+          <span class="material-symbols-outlined text-[14px]">refresh</span> REFRESH
+        </button>
+      </div>
+      <div id="pendingList" class="space-y-3">
+        <p class="text-sm text-on-surface-variant">Loading...</p>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- TAB: MANAGE USERS (admin only)                             -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <div id="tabUsers" class="hidden">
+      <div class="mb-lg flex flex-col sm:flex-row justify-between sm:items-end gap-2">
+        <div>
+          <h2 class="font-headline-md text-headline-md text-on-surface mb-xs">Manage Users</h2>
+          <p class="text-xs font-label-caps text-on-surface-variant flex items-center gap-xs">
+            <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+            ADMIN ONLY — ADD, DEACTIVATE, OR RESET PASSWORDS
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="loadUsers()" class="text-xs px-3 py-2 border border-outline-variant hover:bg-surface-container-high transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">refresh</span> REFRESH
+          </button>
+          <button onclick="showAddUserModal()" class="text-xs px-3 py-2 bg-primary text-on-primary hover:opacity-90 transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">person_add</span> ADD USER
+          </button>
+        </div>
+      </div>
+      <div class="bg-white border border-outline-variant overflow-x-auto">
+        <table class="w-full text-xs min-w-[600px]">
+          <thead>
+            <tr class="bg-surface-container border-b border-outline-variant">
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Username</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Display Name</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Role</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Status</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- TAB: AUDIT TRAIL (admin only)                             -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <div id="tabAudit" class="hidden">
+      <div class="mb-lg flex flex-col sm:flex-row justify-between sm:items-end gap-2">
+        <div>
+          <h2 class="font-headline-md text-headline-md text-on-surface mb-xs">Audit Trail</h2>
+          <p class="text-xs font-label-caps text-on-surface-variant flex items-center gap-xs">
+            <span class="material-symbols-outlined text-[14px]">history</span>
+            COMPLETE LOG OF ALL SYSTEM ACTIONS
+          </p>
+        </div>
+        <div class="flex gap-2 items-center">
+          <select id="auditFilter" onchange="filterAuditLog()" class="h-9 px-3 border border-outline-variant bg-white text-xs focus:outline-none focus:border-primary">
+            <option value="ALL">ALL ACTIONS</option>
+            <option value="REQUEST_SUBMITTED">SUBMITTED</option>
+            <option value="REQUEST_APPROVED">APPROVED</option>
+            <option value="REQUEST_REJECTED">REJECTED</option>
+            <option value="USER_CREATED">USER CREATED</option>
+            <option value="USER_UPDATED">USER UPDATED</option>
+          </select>
+          <button onclick="loadAuditLog()" class="text-xs px-3 py-2 border border-outline-variant hover:bg-surface-container-high transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">refresh</span> REFRESH
+          </button>
+        </div>
+      </div>
+      <div class="bg-white border border-outline-variant overflow-x-auto">
+        <table class="w-full text-xs min-w-[700px]">
+          <thead>
+            <tr class="bg-surface-container border-b border-outline-variant">
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Timestamp</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Action</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">User</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Details</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Target</th>
+            </tr>
+          </thead>
+          <tbody id="auditTableBody">
+            <tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Add User Modal -->
+<div id="addUserModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="closeAddUserModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-outline-variant shadow-2xl w-full max-w-md p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold">Add New User</h3>
+      <button onclick="closeAddUserModal()" class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">close</button>
+    </div>
+    <form id="addUserForm" class="space-y-3">
+      <div>
+        <label class="block text-[10px] font-bold text-on-surface-variant uppercase mb-1">Username</label>
+        <input type="text" id="newUsername" required class="w-full h-10 px-3 border border-outline-variant bg-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="USERNAME"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-on-surface-variant uppercase mb-1">Display Name</label>
+        <input type="text" id="newDisplayName" class="w-full h-10 px-3 border border-outline-variant bg-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="FULL NAME"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-on-surface-variant uppercase mb-1">Password</label>
+        <input type="password" id="newPassword" required minlength="4" class="w-full h-10 px-3 border border-outline-variant bg-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="MIN 4 CHARACTERS"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-on-surface-variant uppercase mb-1">Role</label>
+        <select id="newRole" class="w-full h-10 px-3 border border-outline-variant bg-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div id="addUserError" class="hidden text-xs text-red-600 bg-red-50 px-3 py-2 border border-red-200"></div>
+      <div class="flex gap-2 pt-2">
+        <button type="button" onclick="closeAddUserModal()" class="flex-1 h-10 border border-outline-variant text-on-surface-variant text-xs font-semibold hover:bg-surface-container-high transition-colors">CANCEL</button>
+        <button type="submit" id="addUserBtn" class="flex-1 h-10 bg-primary text-on-primary text-xs font-semibold hover:opacity-90 transition-colors">ADD USER</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div id="rejectModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="closeRejectModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-outline-variant shadow-2xl w-full max-w-md p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold text-red-600">Reject Request</h3>
+      <button onclick="closeRejectModal()" class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">close</button>
+    </div>
+    <div>
+      <label class="block text-[10px] font-bold text-on-surface-variant uppercase mb-1">Remarks / Reason</label>
+      <textarea id="rejectRemarks" rows="3" class="w-full px-3 py-2 border border-outline-variant bg-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="WHY IS THIS BEING REJECTED?"></textarea>
+    </div>
+    <div class="flex gap-2 pt-4">
+      <button onclick="closeRejectModal()" class="flex-1 h-10 border border-outline-variant text-xs font-semibold hover:bg-surface-container-high transition-colors">CANCEL</button>
+      <button onclick="confirmReject()" id="confirmRejectBtn" class="flex-1 h-10 bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors">REJECT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Display Name Modal -->
+<div id="editNameModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="closeEditNameModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-outline-variant shadow-2xl w-full max-w-md p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold">Edit Display Name</h3>
+      <button onclick="closeEditNameModal()" class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">close</button>
+    </div>
+    <div class="space-y-3">
+      <div>
+        <label class="block text-[10px] font-bold text-on-surface-variant uppercase mb-1">Username</label>
+        <input type="text" id="editNameUsername" readonly class="w-full h-10 px-3 border border-outline-variant bg-surface-container text-sm text-on-surface-variant cursor-not-allowed"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-on-surface-variant uppercase mb-1">Display Name</label>
+        <input type="text" id="editNameValue" class="w-full h-10 px-3 border border-outline-variant bg-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="ENTER NEW DISPLAY NAME"/>
+      </div>
+    </div>
+    <div class="flex gap-2 pt-4">
+      <button onclick="closeEditNameModal()" class="flex-1 h-10 border border-outline-variant text-xs font-semibold hover:bg-surface-container-high transition-colors">CANCEL</button>
+      <button onclick="saveEditName()" id="saveEditNameBtn" class="flex-1 h-10 bg-primary text-on-primary text-xs font-semibold hover:opacity-90 transition-colors">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="fixed bottom-4 right-4 md:bottom-lg md:right-lg bg-inverse-surface text-inverse-on-surface px-lg py-md shadow-2xl translate-y-20 transition-transform duration-300 flex items-center gap-md z-[100] max-w-[90vw]" id="successToast">
+  <span class="material-symbols-outlined text-green-400">check_circle</span>
+  <div><p class="font-button-text">Success</p><p class="text-xs opacity-80" id="toastMessage">Done.</p></div>
+</div>
+<div class="fixed bottom-4 left-4 md:bottom-lg md:left-lg bg-red-800 text-white px-lg py-md shadow-2xl translate-y-20 transition-transform duration-300 flex items-center gap-md z-[100] max-w-[90vw]" id="errorToast">
+  <span class="material-symbols-outlined text-red-300">error</span>
+  <div><p class="font-button-text">Error</p><p class="text-xs opacity-80" id="errorToastMessage">Something went wrong.</p></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// AUTH CHECK
+// ══════════════════════════════════════════════════════════════
+const session = JSON.parse(localStorage.getItem('session') || 'null');
+if (!session || !session.username) { window.location.href = '/login.html'; }
+
+const isAdmin = session && session.role === 'admin';
+const SUBMIT_URL = '/api/approve';
+const USERS_URL = '/api/users';
+let operationCount = 0;
+let currentRejectRow = null;
+
+// ══════════════════════════════════════════════════════════════
+// SIDEBAR SETUP
+// ══════════════════════════════════════════════════════════════
+const sidebarUsername = document.getElementById('sidebarUsername');
+const sidebarRole = document.getElementById('sidebarRole');
+const navPending = document.getElementById('navPending');
+const navUsers = document.getElementById('navUsers');
+const navAudit = document.getElementById('navAudit');
+
+sidebarUsername.textContent = session?.displayName || session?.username || 'User';
+sidebarRole.textContent = isAdmin ? 'Admin Access' : 'Standard Access';
+
+if (isAdmin) {
+  navPending.classList.remove('hidden');
+  navUsers.classList.remove('hidden');
+  navAudit.classList.remove('hidden');
+}
+
+function logout() { localStorage.removeItem('session'); window.location.href = '/login.html'; }
+
+// ══════════════════════════════════════════════════════════════
+// MOBILE SIDEBAR
+// ══════════════════════════════════════════════════════════════
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+menuBtn.addEventListener('click', () => { sidebar.classList.contains('open') ? closeSidebar() : openSidebar(); });
+overlay.addEventListener('click', closeSidebar);
+window.addEventListener('resize', () => { if (window.innerWidth >= 768) closeSidebar(); });
+
+// ══════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════════════════
+const tabs = { form: 'tabForm', pending: 'tabPending', users: 'tabUsers', audit: 'tabAudit' };
+const titles = {
+  form:    { lg: 'ONLINE REQUEST FORM',   sm: 'REQUEST FORM' },
+  pending: { lg: 'PENDING APPROVALS',     sm: 'APPROVALS' },
+  users:   { lg: 'MANAGE USERS',          sm: 'USERS' },
+  audit:   { lg: 'AUDIT TRAIL',           sm: 'AUDIT LOG' },
+};
+
+function switchTab(tab) {
+  Object.values(tabs).forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById(tabs[tab]).classList.remove('hidden');
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+  document.getElementById('headerTitle').textContent = titles[tab].lg;
+  document.getElementById('headerTitleSm').textContent = titles[tab].sm;
+
+  closeSidebar();
+
+  if (tab === 'pending') loadPending();
+  if (tab === 'users') loadUsers();
+  if (tab === 'audit') loadAuditLog();
+}
+
+// ══════════════════════════════════════════════════════════════
+// TOASTS
+// ══════════════════════════════════════════════════════════════
+function showToast(type, message) {
+  const toast = type === 'error' ? document.getElementById('errorToast') : document.getElementById('successToast');
+  const msgEl = type === 'error' ? document.getElementById('errorToastMessage') : document.getElementById('toastMessage');
+  msgEl.textContent = message;
+  toast.style.transform = 'translateY(0)';
+  setTimeout(() => { toast.style.transform = 'translateY(120%)'; }, 4000);
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONNECTION CHECK
+// ══════════════════════════════════════════════════════════════
+async function checkConnection() {
+  const el = document.getElementById('connectionStatus');
+  try {
+    const r = await fetch(SUBMIT_URL, { method: 'OPTIONS' });
+    el.textContent = (r.ok || r.status === 200) ? 'ONLINE' : 'READY';
+    el.className = 'font-mono ' + ((r.ok || r.status === 200) ? 'text-green-600' : 'text-yellow-600');
+  } catch { el.textContent = 'READY'; el.className = 'font-mono text-yellow-600'; }
+}
+checkConnection();
+
+// ══════════════════════════════════════════════════════════════
+// FORM SUBMISSION
+// ══════════════════════════════════════════════════════════════
+function addOperationEntry(jobId, status) {
+  const feed = document.getElementById('operationsFeed');
+  const empty = feed.querySelector('.opacity-50');
+  if (empty && operationCount === 0) feed.innerHTML = '';
+  operationCount++;
+  const div = document.createElement('div');
+  div.className = 'bg-white border border-outline-variant p-md flex items-center gap-md';
+  div.innerHTML = `<div class="w-8 h-8 rounded bg-green-100 flex items-center justify-center"><span class="material-symbols-outlined text-green-700 text-[16px]">check_circle</span></div><div><p class="text-[11px] font-bold">${jobId}</p><p class="text-[10px] text-on-surface-variant uppercase">${status}</p></div>`;
+  feed.insertBefore(div, feed.firstChild);
+}
+
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  const form = document.getElementById('requestForm');
+  const formData = {
+    date_requested: document.getElementById('date_requested').value,
+    job_id: document.getElementById('job_id').value,
+    particulars: document.getElementById('particulars').value,
+    consignee: document.getElementById('consignee').value,
+    mbl: document.getElementById('mbl').value,
+    hbl: document.getElementById('hbl').value,
+    container_number: document.getElementById('container_number').value,
+    account_no: document.getElementById('account_no').value,
+    requested_by: document.getElementById('requested_by').value,
+    supplier_name: document.getElementById('supplier_name').value,
+    amount_2: document.getElementById('amount_2').value,
+    bank_name: document.getElementById('bank_name').value,
+    payment_status: document.getElementById('payment_status').value,
+    timestamp: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }),
+    submitted_by: session ? session.username : 'unknown',
+  };
+  const required = ['date_requested', 'job_id', 'particulars', 'consignee', 'requested_by', 'supplier_name'];
+  for (const field of required) {
+    if (!formData[field]) {
+      showToast('error', 'Missing: ' + field.replace(/_/g, ' ').toUpperCase());
+      document.getElementById(field).focus();
+      return;
+    }
+  }
+  btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> SUBMITTING...`;
+  btn.disabled = true;
+  try {
+    const response = await fetch(SUBMIT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
+    const result = await response.json();
+    if (result.success) {
+      showToast('success', 'Request submitted for admin approval!');
+      addOperationEntry(formData.job_id || 'REQ-NEW', 'Pending Approval');
+      form.reset();
+      document.getElementById('date_requested').value = new Date().toISOString().split('T')[0];
+    } else {
+      showToast('error', result.error || 'Server error.');
+    }
+  } catch { showToast('error', 'Network error.'); }
+  finally {
+    btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_upload</span> SUBMIT FOR APPROVAL`;
+    btn.disabled = false;
+  }
+}
+document.getElementById('submitBtn').addEventListener('click', submitForm);
+
+document.querySelectorAll('.form-input-caps').forEach(input => {
+  input.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
+});
+const dateInput = document.getElementById('date_requested');
+if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
+
+// ══════════════════════════════════════════════════════════════
+// PENDING APPROVALS (Admin)
+// ══════════════════════════════════════════════════════════════
+async function loadPending() {
+  const list = document.getElementById('pendingList');
+  list.innerHTML = '<p class="text-sm text-on-surface-variant">Loading...</p>';
+  try {
+    const res = await fetch(SUBMIT_URL);
+    const data = await res.json();
+    if (!data.success) { list.innerHTML = '<p class="text-sm text-red-500">' + data.error + '</p>'; return; }
+    const pending = data.requests.filter(r => r.status === 'PENDING');
+    const reviewed = data.requests.filter(r => r.status !== 'PENDING');
+    const badge = document.getElementById('pendingBadge');
+    badge.textContent = pending.length;
+    badge.classList.toggle('hidden', pending.length === 0);
+    let html = '';
+    if (pending.length === 0 && reviewed.length === 0) html = '<p class="text-sm text-on-surface-variant text-center py-8">No requests yet.</p>';
+    pending.forEach(r => { html += renderRequestCard(r, true); });
+    reviewed.reverse().forEach(r => { html += renderRequestCard(r, false); });
+    list.innerHTML = html;
+  } catch { list.innerHTML = '<p class="text-sm text-red-500">Error loading requests.</p>'; }
+}
+
+function renderRequestCard(r, isPending) {
+  const sc = r.status === 'APPROVED' ? 'bg-green-100 text-green-700' : r.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+  const actions = isPending ? `<div class="flex gap-2 mt-3"><button onclick="approveRequest(${r.row})" class="flex-1 h-9 bg-green-600 text-white text-[11px] font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[14px]">check</span> APPROVE</button><button onclick="openRejectModal(${r.row})" class="flex-1 h-9 bg-red-50 text-red-600 border border-red-200 text-[11px] font-semibold hover:bg-red-100 transition-colors flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[14px]">close</span> REJECT</button></div>` : '';
+  const reviewInfo = !isPending ? `<div class="mt-2 text-[10px] text-on-surface-variant">${r.status === 'APPROVED' ? 'Approved' : 'Rejected'} by ${r.reviewedBy || 'admin'} ${r.reviewedAt ? 'at ' + r.reviewedAt : ''}${r.adminRemarks ? '<br>Remarks: ' + r.adminRemarks : ''}</div>` : '';
+  return `<div class="bg-white border border-outline-variant p-4 ${!isPending ? 'opacity-70' : ''}"><div class="flex items-start justify-between mb-2"><div><p class="text-[11px] font-bold">${r.jobId || 'NO JOB ID'}</p><p class="text-[10px] text-on-surface-variant">${r.dateRequested || ''} &middot; Submitted by ${r.submittedBy}</p></div><span class="text-[10px] font-bold px-2 py-0.5 ${sc}">${r.status}</span></div><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] mt-2"><div><span class="text-on-surface-variant">PARTICULARS:</span> <span class="font-medium">${r.particulars || '-'}</span></div><div><span class="text-on-surface-variant">CONSIGNEE:</span> <span class="font-medium">${r.consignee || '-'}</span></div><div><span class="text-on-surface-variant">SUPPLIER:</span> <span class="font-medium">${r.supplierName || '-'}</span></div><div><span class="text-on-surface-variant">AMOUNT:</span> <span class="font-medium">${r.totalAmount ? '₱' + Number(r.totalAmount).toLocaleString() : '-'}</span></div><div><span class="text-on-surface-variant">MBL:</span> <span class="font-medium">${r.mbl || '-'}</span></div><div><span class="text-on-surface-variant">HBL:</span> <span class="font-medium">${r.hbl || '-'}</span></div><div><span class="text-on-surface-variant">CONTAINER:</span> <span class="font-medium">${r.containerNumber || '-'}</span></div><div><span class="text-on-surface-variant">BANK:</span> <span class="font-medium">${r.bankName || '-'}</span></div><div><span class="text-on-surface-variant">PAYMENT:</span> <span class="font-medium">${r.paymentStatus || '-'}</span></div><div><span class="text-on-surface-variant">REQUESTED BY:</span> <span class="font-medium">${r.requestedBy || '-'}</span></div></div>${reviewInfo}${actions}</div>`;
+}
+
+async function approveRequest(row) {
+  try {
+    const res = await fetch(SUBMIT_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, action: 'approve', reviewedBy: session.username }) });
+    const data = await res.json();
+    if (data.success) { showToast('success', 'Request approved and synced to database.'); loadPending(); }
+    else showToast('error', data.error);
+  } catch { showToast('error', 'Network error.'); }
+}
+
+function openRejectModal(row) { currentRejectRow = row; document.getElementById('rejectRemarks').value = ''; document.getElementById('rejectModal').classList.remove('hidden'); }
+function closeRejectModal() { document.getElementById('rejectModal').classList.add('hidden'); currentRejectRow = null; }
+async function confirmReject() {
+  const remarks = document.getElementById('rejectRemarks').value.trim();
+  if (!remarks) { alert('Please provide a reason.'); return; }
+  try {
+    const res = await fetch(SUBMIT_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: currentRejectRow, action: 'reject', remarks, reviewedBy: session.username }) });
+    const data = await res.json();
+    if (data.success) { showToast('success', 'Request rejected.'); closeRejectModal(); loadPending(); }
+    else showToast('error', data.error);
+  } catch { showToast('error', 'Network error.'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MANAGE USERS (Admin)
+// ══════════════════════════════════════════════════════════════
+async function loadUsers() {
+  const tbody = document.getElementById('usersTableBody');
+  try {
+    const res = await fetch(USERS_URL);
+    const data = await res.json();
+    if (!data.success || data.users.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant">No users found.</td></tr>'; return; }
+    tbody.innerHTML = data.users.map(u => `<tr class="border-b border-outline-variant hover:bg-surface-container-low"><td class="px-4 py-3 font-medium">${u.username}</td><td class="px-4 py-3" id="dn-${u.row}">${u.displayName}</td><td class="px-4 py-3"><span class="px-2 py-0.5 text-[10px] font-bold uppercase ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${u.role}</span></td><td class="px-4 py-3"><span class="px-2 py-0.5 text-[10px] font-bold uppercase ${u.active === 'YES' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${u.active === 'YES' ? 'Active' : 'Inactive'}</span></td><td class="px-4 py-3"><div class="flex gap-1 flex-wrap"><button onclick="openEditNameModal(${u.row}, '${u.username}', '${(u.displayName || '').replace(/'/g, "\\'")}')" class="text-[10px] px-2 py-1 border border-outline-variant hover:bg-surface-container-high transition-colors">EDIT NAME</button><button onclick="toggleUserActive(${u.row}, '${u.active}')" class="text-[10px] px-2 py-1 border border-outline-variant hover:bg-surface-container-high transition-colors">${u.active === 'YES' ? 'DEACTIVATE' : 'ACTIVATE'}</button><button onclick="resetPassword(${u.row}, '${u.username}')" class="text-[10px] px-2 py-1 border border-outline-variant hover:bg-surface-container-high transition-colors">RESET PASS</button></div></td></tr>`).join('');
+  } catch { tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-red-500">Error loading users.</td></tr>'; }
+}
+
+async function toggleUserActive(row, currentActive) {
+  const newActive = currentActive === 'YES' ? 'NO' : 'YES';
+  try {
+    const res = await fetch(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, active: newActive }) });
+    const data = await res.json();
+    if (data.success) { showToast('success', 'User ' + (newActive === 'YES' ? 'activated' : 'deactivated') + '.'); loadUsers(); }
+    else showToast('error', data.error);
+  } catch { showToast('error', 'Network error.'); }
+}
+
+async function resetPassword(row, username) {
+  const newPass = prompt('Enter new password for ' + username + ':');
+  if (!newPass || newPass.length < 4) { if (newPass !== null) alert('Min 4 characters.'); return; }
+  try {
+    const res = await fetch(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row, password: newPass }) });
+    const data = await res.json();
+    if (data.success) showToast('success', 'Password reset.');
+    else showToast('error', data.error);
+  } catch { showToast('error', 'Network error.'); }
+}
+
+let editNameRow = null;
+function openEditNameModal(row, username, currentName) {
+  editNameRow = row;
+  document.getElementById('editNameUsername').value = username;
+  document.getElementById('editNameValue').value = currentName;
+  document.getElementById('editNameModal').classList.remove('hidden');
+  document.getElementById('editNameValue').focus();
+}
+function closeEditNameModal() { document.getElementById('editNameModal').classList.add('hidden'); editNameRow = null; }
+async function saveEditName() {
+  const newName = document.getElementById('editNameValue').value.trim();
+  if (!newName) { alert('Display name cannot be empty.'); return; }
+  const btn = document.getElementById('saveEditNameBtn');
+  btn.textContent = 'SAVING...'; btn.disabled = true;
+  try {
+    const res = await fetch(USERS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: editNameRow, displayName: newName }) });
+    const data = await res.json();
+    if (data.success) { showToast('success', 'Display name updated.'); closeEditNameModal(); loadUsers(); }
+    else showToast('error', data.error);
+  } catch { showToast('error', 'Network error.'); }
+  finally { btn.textContent = 'SAVE'; btn.disabled = false; }
+}
+
+function showAddUserModal() { document.getElementById('addUserModal').classList.remove('hidden'); document.getElementById('addUserForm').reset(); document.getElementById('addUserError').classList.add('hidden'); }
+function closeAddUserModal() { document.getElementById('addUserModal').classList.add('hidden'); }
+
+document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('addUserError'); errEl.classList.add('hidden');
+  const btn = document.getElementById('addUserBtn'); btn.textContent = 'ADDING...'; btn.disabled = true;
+  try {
+    const res = await fetch(USERS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: document.getElementById('newUsername').value.trim(), password: document.getElementById('newPassword').value, displayName: document.getElementById('newDisplayName').value.trim(), role: document.getElementById('newRole').value }) });
+    const data = await res.json();
+    if (data.success) { showToast('success', 'User added.'); closeAddUserModal(); loadUsers(); }
+    else { errEl.textContent = data.error; errEl.classList.remove('hidden'); }
+  } catch { errEl.textContent = 'Network error.'; errEl.classList.remove('hidden'); }
+  finally { btn.textContent = 'ADD USER'; btn.disabled = false; }
+});
+
+// ══════════════════════════════════════════════════════════════
+// AUDIT TRAIL (Admin)
+// ══════════════════════════════════════════════════════════════
+let allAuditLogs = [];
+const AUDIT_URL = '/api/audit';
+
+async function loadAuditLog() {
+  const tbody = document.getElementById('auditTableBody');
+  tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant">Loading...</td></tr>';
+  try {
+    const res = await fetch(AUDIT_URL);
+    const data = await res.json();
+    if (!data.success || data.logs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant">No audit logs yet.</td></tr>';
+      return;
+    }
+    allAuditLogs = data.logs;
+    renderAuditLogs(allAuditLogs);
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-red-500">Error loading audit log.</td></tr>';
+  }
+}
+
+function filterAuditLog() {
+  const filter = document.getElementById('auditFilter').value;
+  if (filter === 'ALL') { renderAuditLogs(allAuditLogs); return; }
+  renderAuditLogs(allAuditLogs.filter(l => l.action === filter));
+}
+
+function renderAuditLogs(logs) {
+  const tbody = document.getElementById('auditTableBody');
+  const actionColors = {
+    'REQUEST_SUBMITTED': 'bg-blue-100 text-blue-700',
+    'REQUEST_APPROVED': 'bg-green-100 text-green-700',
+    'REQUEST_REJECTED': 'bg-red-100 text-red-700',
+    'USER_CREATED': 'bg-purple-100 text-purple-700',
+    'USER_UPDATED': 'bg-yellow-100 text-yellow-700',
+  };
+  const actionLabels = {
+    'REQUEST_SUBMITTED': 'SUBMITTED',
+    'REQUEST_APPROVED': 'APPROVED',
+    'REQUEST_REJECTED': 'REJECTED',
+    'USER_CREATED': 'USER CREATED',
+    'USER_UPDATED': 'USER UPDATED',
+  };
+  tbody.innerHTML = logs.map(l => {
+    const color = actionColors[l.action] || 'bg-gray-100 text-gray-700';
+    const label = actionLabels[l.action] || l.action;
+    return `<tr class="border-b border-outline-variant hover:bg-surface-container-low">
+      <td class="px-4 py-3 whitespace-nowrap">${l.timestamp}</td>
+      <td class="px-4 py-3"><span class="px-2 py-0.5 text-[10px] font-bold uppercase ${color}">${label}</span></td>
+      <td class="px-4 py-3 font-medium">${l.user}</td>
+      <td class="px-4 py-3 text-on-surface-variant max-w-xs truncate">${l.details}</td>
+      <td class="px-4 py-3 text-on-surface-variant">${l.target}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// THEME TOGGLE
+// ══════════════════════════════════════════════════════════════
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+function updateThemeUI(theme) {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+  document.documentElement.classList.toggle('light', theme !== 'dark');
+  themeToggleBtn.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+}
+updateThemeUI(localStorage.getItem('theme') || 'light');
+themeToggleBtn.addEventListener('click', () => {
+  const t = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+  localStorage.setItem('theme', t); updateThemeUI(t);
+});
+
+// ══════════════════════════════════════════════════════════════
+// AUTO-LOAD PENDING COUNT FOR ADMIN
+// ══════════════════════════════════════════════════════════════
+if (isAdmin) {
+  (async () => {
+    try {
+      const res = await fetch(SUBMIT_URL);
+      const data = await res.json();
+      if (data.success) {
+        const count = data.requests.filter(r => r.status === 'PENDING').length;
+        const badge = document.getElementById('pendingBadge');
+        badge.textContent = count;
+        badge.classList.toggle('hidden', count === 0);
+      }
+    } catch {}
+  })();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ONLINE REQUEST FORM - Dispatcher Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#071e27",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "tertiary-container": "#5f6060",
+                    "surface-container-low": "#f6f3f2",
+                    "secondary": "#4c616c",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#00468b",
+                    "outline-variant": "#c2c6d4",
+                    "outline": "#727783",
+                    "primary-fixed-dim": "#a8c8ff",
+                    "on-secondary-fixed-variant": "#354a53",
+                    "inverse-primary": "#a8c8ff",
+                    "on-primary-fixed": "#001b3d",
+                    "primary-fixed": "#d6e3ff",
+                    "surface-container": "#f0eded",
+                    "on-surface": "#1b1b1b",
+                    "inverse-on-surface": "#f3f0ef",
+                    "inverse-surface": "#313030",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#dbdbdb",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "primary-container": "#005fb8",
+                    "secondary-container": "#cfe6f2",
+                    "secondary-fixed-dim": "#b4cad6",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary": "#474849",
+                    "surface-variant": "#e5e2e1",
+                    "on-primary-container": "#cadcff",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-background": "#1b1b1b",
+                    "surface-bright": "#fcf9f8",
+                    "background": "#fcf9f8",
+                    "surface-container-high": "#eae7e7",
+                    "surface-dim": "#dcd9d9",
+                    "surface-tint": "#005db5",
+                    "surface": "#fcf9f8",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#cfe6f2",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-container": "#526772",
+                    "primary": "#00488d",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e5e2e1",
+                    "on-surface-variant": "#424752"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "sm": "8px",
+                    "unit": "4px",
+                    "xs": "4px",
+                    "gutter": "12px",
+                    "form-gap": "20px",
+                    "xl": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "button-text": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "input-text": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "button-text": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "input-text": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F3F3F3;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input-caps {
+            text-transform: uppercase;
+        }
+        /* Custom scrollbar for enterprise look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="bg-surface dark:bg-surface-dim text-primary dark:text-primary-fixed-dim border-b border-outline-variant dark:border-outline flex justify-between items-center px-lg h-16 w-full fixed top-0 z-50">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">assignment_turned_in</span>
+<h1 class="font-headline-lg text-headline-lg text-primary dark:text-primary-fixed-dim">ONLINE REQUEST FORM</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80">account_circle</button>
+<button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80">settings</button>
+</div>
+</header>
+<!-- Sidebar Navigation -->
+<aside class="bg-surface-container-low dark:bg-surface-container border-r border-outline-variant dark:border-outline flex flex-col fixed left-0 top-0 h-full w-64 z-40 pt-16">
+<div class="px-lg py-md mb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface dark:text-on-surface-variant">Dispatcher Pro</h2>
+<p class="text-xs font-label-caps text-on-surface-variant opacity-70 uppercase">Enterprise Logistics</p>
+</div>
+<nav class="flex-1 px-sm space-y-1">
+<!-- Active State: Requests -->
+<a class="flex items-center gap-md px-md py-3 rounded-lg bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary font-button-text transition-all duration-150" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-body-md">Requests</span>
+</a>
+
+</nav>
+<div class="p-md mt-auto">
+<div class="flex items-center gap-sm bg-surface-container-high p-sm rounded-lg border border-outline-variant">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed">person</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold truncate">ADMIN_OPERATOR</p>
+<p class="text-[10px] text-on-surface-variant">Standard Access</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 pt-16 min-h-screen bg-[#F3F3F3]">
+<div class="max-w-5xl mx-auto p-xl">
+<!-- Page Header & Instructions -->
+<div class="mb-lg flex justify-between items-end">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs">New Logistics Request</h2>
+<p class="text-xs font-label-caps text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                        NOTE: DATA ENTRY ALL CAPS
+                    </p>
+</div>
+<div class="text-xs text-on-surface-variant bg-surface-container-high px-sm py-1 border border-outline-variant">
+                    SESSION ID: <span class="font-mono">REQ-2023-9001</span>
+</div>
+</div>
+<!-- Form Container -->
+<div class="bg-white border border-outline-variant shadow-sm p-xl">
+<form class="space-y-form-gap" id="requestForm">
+<!-- Form Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-xl gap-y-form-gap">
+<!-- 1. DATE REQUESTED -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="date_requested">DATE REQUESTED</label>
+<input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="date_requested" name="date_requested" type="date"/>
+</div>
+<!-- 2. JOB ID -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="job_id">JOB ID</label>
+<input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="job_id" name="job_id" placeholder="ENTER JOB ID" type="text"/>
+</div>
+<!-- 3. PARTICULARS (Full Width Span) -->
+<div class="md:col-span-2 flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="particulars">PARTICULARS</label>
+<select class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="particulars" name="particulars">
+  <option value="" disabled selected>SELECT PARTICULARS</option>
+  <option>-</option>
+  <option>ALLOWANCES</option>
+  <option>BREAKBULK INSPECTION</option>
+  <option>BROKER FEE &amp; PORT CHARGES</option>
+  <option>BROKERAGE &amp; PORT</option>
+  <option>BUSINESS PERMIT</option>
+  <option>CDEC EIP/AEDS</option>
+  <option>CDEC FUNDING</option>
+  <option>CONDEP</option>
+  <option>CONDEP REFUND</option>
+  <option>CONTAINER DEPOSIT</option>
+  <option>CONTAINER REFUND</option>
+  <option>CONTRACTOR</option>
+  <option>CTF</option>
+  <option>CTF / CUSTOMS</option>
+  <option>DELIVERY CHARGE</option>
+  <option>DEMURRAGE CHARGE</option>
+  <option>DETENTION</option>
+  <option>DETENTION CHARGE/ORIGIN CHARGE</option>
+  <option>DETENTION CHARGES</option>
+  <option>DUTIES &amp; TAXES</option>
+  <option>EKONEK EIP</option>
+  <option>EKONEK VASP</option>
+  <option>ENCASHMENT</option>
+  <option>ETRACC</option>
+  <option>EZTS</option>
+  <option>FABRICATION</option>
+  <option>FORKLIFT RENTAL</option>
+  <option>FRANCHISE FEE</option>
+  <option>FREIGHT&amp;LIFT ON/OFF CHARGES</option>
+  <option>INSTALLATION OF SIGNAGES</option>
+  <option>INTERCOMMERCE VASP</option>
+  <option>INTERCOMMER FUNDING</option>
+  <option>LATE DELIVERY ORDER FEE</option>
+  <option>LOCAL</option>
+  <option>LOCAL &amp; CONDEP</option>
+  <option>LOCAL CHARGE</option>
+  <option>LOCAL CHARGE &amp; CONDEP</option>
+  <option>LOCAL CHARGES</option>
+  <option>MANIFEST &amp; TURNOVER FEE</option>
+  <option>OCEAN FREIGHT</option>
+  <option>ORIGIN CHARGE</option>
+  <option>ORIGIN CHARGES &amp; OCEAN FREIGHT</option>
+  <option>ORGIN CHARGE</option>
+  <option>PCF REPLENISHMENT</option>
+  <option>PERSONAL</option>
+  <option>PORT CHARGES</option>
+  <option>PROCESSING</option>
+  <option>PROCESSING &amp; PORT CHARGES</option>
+  <option>PTOPS IT FEE</option>
+  <option>RACKING INSTALLMENT</option>
+  <option>RENEWAL FEE FOR SURETY INSURANCE BOND</option>
+  <option>REPLENISHMENT</option>
+  <option>SMARTLINK PRE-ADVCE</option>
+  <option>SPONSORSHIP</option>
+  <option>STORAGE</option>
+  <option>STORAGE FEE</option>
+  <option>STRUCTURAL ANALYSIS</option>
+  <option>SURVEY REPORT CHARGE</option>
+  <option>TRUCKING CHARGE</option>
+  <option>TURNOVER</option>
+  <option>TURNOVER FEE</option>
+  <option>WAREHOUSE RENTAL</option>
+</select>
+</div>
+<!-- 4. CONSIGNEE -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="consignee">CONSIGNEE</label>
+<input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="consignee" name="consignee" placeholder="RECEIVING PARTY" type="text"/>
+</div>
+<!-- 5. MBL -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="mbl">MBL (MASTER BILL OF LADING)</label>
+<input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="mbl" name="mbl" placeholder="MBL NUMBER" type="text"/>
+</div>
+<!-- 6. HBL -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="hbl">HBL (HOUSE BILL OF LADING)</label>
+<input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="hbl" name="hbl" placeholder="HBL NUMBER" type="text"/>
+</div>
+<!-- 7. CONTAINER NUMBER -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="container_number">CONTAINER NUMBER</label>
+<input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="container_number" name="container_number" placeholder="E.G. ABCD1234567" type="text"/>
+</div>
+<!-- 8. AMOUNT (1) -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="amount_1">TOTAL AMOUNT (VALUATION)</label>
+<input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="amount_1" name="amount_1" step="0.01" type="number"/>
+</div>
+<!-- 9. REQUESTED BY -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="requested_by">REQUESTED BY</label>
+<input class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="requested_by" name="requested_by" placeholder="PERSONNEL NAME" type="text"/>
+</div>
+<!-- 10. SUPPLIER'S NAME -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="supplier_name">SUPPLIER'S NAME</label>
+<select class="h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text form-input-caps focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="supplier_name" name="supplier_name">
+  <option value="" disabled selected>SELECT SUPPLIER</option>
+  <option>ABDULMUGNIE A. ACMAD</option>
+  <option>AFFOGATO CORP.</option>
+  <option>AGX GLOBAL EXPRESS INC.</option>
+  <option>AMYHR HUSSIEN MANALAO DOMADO</option>
+  <option>APL CO PTE LTD</option>
+  <option>ASCENT SOLUTIONS PHILIPPINES INC.</option>
+  <option>ASIAN CONSOLIDATION INT'L SERVICES INC.</option>
+  <option>ASIAN CONSOLIDATION INT'L SERVICES INC. NEW</option>
+  <option>ASIAEVOLUTION INC.</option>
+  <option>AUTOLIV CEBU SAFETY MANUFACTURING, INC.</option>
+  <option>AWARDS CARGO AGENCY</option>
+  <option>AWARDS CARGO AGENCY PHILS., INC.</option>
+  <option>BANK OF THE PHILIPPINE ISLANDS</option>
+  <option>BANK OF THE PHILIPPINE ISLANDS DVO</option>
+  <option>BEN LINE AGENCIES PHILIPPINES, INC.</option>
+  <option>BILLY JEO RAMOS</option>
+  <option>BOEING MATERIAL HANDLING CORP.</option>
+  <option>BRUCE FOSSILSTONES INT'L CORP.</option>
+  <option>BRUCE FOSSILSTONES INTERNATIONAL CORPORATION</option>
+  <option>BUREAU OF CUSTOMS</option>
+  <option>CARGO DATA EXCHANGE CENTER, INC.</option>
+  <option>CARGOWORTHY FREIGHT SERVICES INC.</option>
+  <option>CEBU MITSUMI INC.</option>
+  <option>CHRISTINE ETHEL MENDOZA</option>
+  <option>CITIBANK FAO FEDERAL EXPRESS PACIFIC,LLC</option>
+  <option>CLIO Shipping and Logistics (Philippines) Inc.</option>
+  <option>CMA CGM PHILIPPINES INC.</option>
+  <option>CMA CGM PHILIPPINES INC - BDO</option>
+  <option>CMA CGM PHILIPPINES INC - HSBC</option>
+  <option>COLORSTEEL SYSTEM CORP.</option>
+  <option>COMPOSTELA STEEL</option>
+  <option>CONSOLATRIX TRUCKING SERVICES</option>
+  <option>CONTAINER LEDGER ACCOUNT PHILS., INC.</option>
+  <option>COSONSA MANUFACTURING INC.</option>
+  <option>COSCO SHIPPING LINES (PHILIPPINES) INC.</option>
+  <option>COTECNA ELITE PHILIPPINES INC.</option>
+  <option>COTS FREIGHT INTERNATIONAL, INC.</option>
+  <option>COTS FREIGHT INTERNATIONAL, INC.1</option>
+  <option>CREST FORWARDER INC.</option>
+  <option>DENNIS INTERNATIONAL MERCHANDISING INC</option>
+  <option>EAGLE EXPRESS LINES INC.</option>
+  <option>EAGLE EXPRESS LINES INC. 2</option>
+  <option>EAST LINE CEBU INC</option>
+  <option>EAST LINE CEBU INC.</option>
+  <option>ECU WORLDWIDE (PHILIPPINES) INC.</option>
+  <option>EFE INDUSTRIAL SOLUTION INC</option>
+  <option>EHNCOR FREIGHT SERVICES INC.</option>
+  <option>EKONEK PILIPINA INC.</option>
+  <option>EVERGREEN LOGISTICS PHILIPPINES CORPORATION</option>
+  <option>EVERGREEN SHIPPING AGENCY</option>
+  <option>EVERGREEN SHIPPING AGENCY - DAVAO</option>
+  <option>EVERGREEN SHIPPING AGENCY PHILS., CORP.</option>
+  <option>EVERGREEN SHIPPING AGENCY PHILIPPINES CORPORATION</option>
+  <option>EVERGREEN SHIPPING UBP</option>
+  <option>EXPEDITORS PHILIPPINES, INC.</option>
+  <option>EYE CARGO LOGISTICS INC</option>
+  <option>FOX LOGISTICS PHILS. INC.</option>
+  <option>FTZ SOLUTIONS INC</option>
+  <option>G&amp;P GLOBAL PACIFIC INTERNATIONAL FREIGHT LOGISTICS, INC.</option>
+  <option>GEOJET LOGISTICS SERVICES INC.</option>
+  <option>GLI-GLOBAL IMPEX CONSOLIDATION, INC.</option>
+  <option>GLOBELINK NVOCC PHILS., INC.</option>
+  <option>GOLDEN ARROW TRUCKING SERVICES</option>
+  <option>GTI LOGISTICS CORPORATION</option>
+  <option>HAMDANEE AMEROL</option>
+  <option>HAZEL BIANCA REMEDIO</option>
+  <option>HSBC FAO CMA CGM PHILIPPINES, INC - CNC</option>
+  <option>HSBC FAO OCEAN NETWORK EXPRESS</option>
+  <option>INTERCOMMERCE NETWORK SERVICE</option>
+  <option>INTERNATIONAL ELEVATOR &amp; EQUIPMENT, INC.</option>
+  <option>JAKE TERRENCE EGUNA</option>
+  <option>JAMES CONLU</option>
+  <option>JENNY JOY GRANADA</option>
+  <option>JOSE ALWEN RODRIGUEZ</option>
+  <option>JUGRO TRANSPORT INT'L. PHILS. CORP.</option>
+  <option>JULIUS CEAZAR JARDIN</option>
+  <option>K5 PLUS LOGISTICS CORPORATION</option>
+  <option>KARGOSMART GLOBAL CORP.</option>
+  <option>KRISTIE ANO-OS</option>
+  <option>LBP CEBU BOC BRANCH IFO BOC FAO ARIE CEBU COSMETIC CORP</option>
+  <option>LBP CEBU BOC BRANCH IFO BOC FAO AUTOLIV CEBU SAFETY MANUFACTURING INC.</option>
+  <option>LBP CEBU BOC BRANCH IFO BOC FAO CEBU MITSUMI INC.</option>
+  <option>LIBERTY INSURANCE CORP.</option>
+  <option>LUISA EVELYN GO</option>
+  <option>MAC XAVIER LOGISTICS</option>
+  <option>MAC-NELS LINE INC.</option>
+  <option>MAC-NELS LINE INC. 2</option>
+  <option>MAERSK FILIPINAS, INC.</option>
+  <option>MANDAUE CITY TREASURER</option>
+  <option>MANILA ADJUSTERS AND SURVEYORS COMPANY</option>
+  <option>MARIA SALOME ARESCO</option>
+  <option>MARICEL T. MUSTAPHA</option>
+  <option>MATTNICK (MN) CONTAINER LINES INC.</option>
+  <option>MCC TRANSPORT PHILIPPINES INC</option>
+  <option>MEPZ-PMA</option>
+  <option>MERCURY FREIGHT INTERNATIONAL INC</option>
+  <option>MICHAEL ANGELO TORRES YUSON</option>
+  <option>MIGENLOGISTICS CORPORATION</option>
+  <option>MINDANAO ICTSI</option>
+  <option>MINDANAO ICTSI 1</option>
+  <option>MIROLA HAMOY</option>
+  <option>MOL LOGISTICS PHILIPPINES INC.</option>
+  <option>MONIC GABUYA</option>
+  <option>MSTAR SHIP AGENCIES INC.</option>
+  <option>MYEG PHILIPPINES</option>
+  <option>NISSIN TRANSPORT PHILIPPINES CORPORATION</option>
+  <option>NNR GLOBAL LOGISTICS (PHILS.) INC.</option>
+  <option>NNR GLOBAL LOGISTICS (PHILIPPINES) INC.</option>
+  <option>OCEAN NETWORK EXPRESS</option>
+  <option>OCEAN NETWORK EXPRESS PHILS., INC.</option>
+  <option>OCEAN NETWORK EXPRESS PHILS., INC. 1</option>
+  <option>OCEAN NETWORK EXPRESS PHILS., INC. - CONDEP</option>
+  <option>ONE GLOBAL LOGISTICS CORP.</option>
+  <option>ONE NETWORK EXPRESS PHILIPPINES INC - LINER</option>
+  <option>ONE WORLD LOGISTICS CEBU INC</option>
+  <option>OOCL PHILS INC.</option>
+  <option>PACIFIC CONCORD CONTAINER LINES, INC.</option>
+  <option>PAUL JOHN OSWA</option>
+  <option>PAUL JOHN OSWA / ENCASHMENT</option>
+  <option>PENANSHIN SHIPPING PHILS., INC.</option>
+  <option>PHIL WORLD FREIGHT FORWARDING INC</option>
+  <option>PHILIPPINES LIGHT-LEATHER INC.</option>
+  <option>PLAS ENTERPRISES &amp; ENGINEERING SERVICES</option>
+  <option>PORT NET LOGISTICS INC</option>
+  <option>PROLINE LOGISTIC PHILIPPINES INC</option>
+  <option>PROLINE LOGISTICS PHILIPPINES INC.</option>
+  <option>PTOPS</option>
+  <option>PWL PRESTIGE WAREHOUSING</option>
+  <option>PWL PRESTIGE WAREHOUSING &amp; LOGISTICS INC.</option>
+  <option>RAMONITO MA-ANO</option>
+  <option>RAPID INC.</option>
+  <option>REMAR F. MANSARI</option>
+  <option>REY F. MERANO</option>
+  <option>REYMAR LABANON</option>
+  <option>RONALD JABAGAT</option>
+  <option>RORY S. CUNAN</option>
+  <option>RUNSAME ORNOPIO RAPESORA</option>
+  <option>RUNSAME RAPESORA</option>
+  <option>SEAHAWK TRANSPORT INC.</option>
+  <option>SEAHAWK TRANSPORT INC. NEW</option>
+  <option>SEALAND MAERSK ASIA PTE LTD</option>
+  <option>SHIPCO TRANSPORT PHILIPPINES INC.</option>
+  <option>SITC CONTAINER LINES PHILS., INC.</option>
+  <option>SITC CONTAINER LINES PHILS., INC. 2</option>
+  <option>SOLIDOR TRUCKING SERVICES</option>
+  <option>SOUTHLINK GLOBAL LOGISTICS, INC.</option>
+  <option>STERLINK FREIGHT INC.</option>
+  <option>SWIFT MODAL INT'L LOGISTICS INC.</option>
+  <option>TPI GLOBAL FORWARDING</option>
+  <option>TOBIAS E. MANALO</option>
+  <option>TOMAS D. ALCANTARA</option>
+  <option>TRANSCONTAINER (TCL) PHILIPPINES, INC.</option>
+  <option>TRANSMODAL INTERNATIONAL INC.</option>
+  <option>TRIPLE V WORLDWIDE LOGISTICS INC.</option>
+  <option>WAN HAI LINES (PHILS.,) INC.</option>
+  <option>WAN HAI LINES (PHILS.,) INC. 2</option>
+  <option>WALLEM PHILIPPINES SHIPPING, INC.</option>
+  <option>YANG MING SHIPPING PHILS., INC.</option>
+  <option>YANG MING SHIPPING PHILS., INC. 2</option>
+  <option>YANG MING SHIPPING PHILS., INC. 3</option>
+  <option>YANG MING SHIPPING PHILS., INC. 4</option>
+  <option>ZIM INTEGRATED SHIPPING SERVICES LTD</option>
+</select>
+</div>
+<!-- 11. TOTAL AMOUNT -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-label-caps text-on-surface-variant" for="amount_2">TOTAL AMOUNT</label>
+<input class="w-full h-10 px-md border border-[#D1D1D1] bg-white font-input-text text-input-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="amount_2" name="amount_2" step="0.01" type="number"/>
+</div>
+</div>
+<!-- Footer / Actions -->
+<div class="pt-xl mt-lg border-t border-[#E5E5E5] flex justify-between items-center">
+<button class="px-lg h-10 border border-[#D1D1D1] text-on-surface-variant font-button-text hover:bg-surface-container transition-colors active:bg-surface-container-high" type="reset">
+                            CLEAR FORM
+                        </button>
+<div class="flex gap-md">
+<button class="bg-primary text-on-primary px-xl h-10 font-button-text hover:bg-[#003d7a] transition-all flex items-center gap-sm shadow-md active:scale-95" onclick="validateAndSimulate()" type="button">
+<span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+                                SUBMIT TO GOOGLE SHEETS
+                            </button>
+</div>
+</div>
+</form>
+</div>
+<!-- Recently Submitted Feed -->
+<div class="mt-lg">
+<div class="flex items-center justify-between mb-md">
+<h3 class="text-xs font-label-caps text-on-surface-variant uppercase">Recent Operations</h3>
+<div class="h-px flex-1 mx-md bg-outline-variant opacity-30"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="bg-white border border-outline-variant p-md flex items-center gap-md">
+<div class="w-8 h-8 rounded bg-green-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-700 text-[16px]">check_circle</span>
+</div>
+<div>
+<p class="text-[11px] font-bold">REQ-9000-A</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Synced Successfully</p>
+</div>
+</div>
+<div class="bg-white border border-outline-variant p-md flex items-center gap-md">
+<div class="w-8 h-8 rounded bg-green-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-700 text-[16px]">check_circle</span>
+</div>
+<div>
+<p class="text-[11px] font-bold">REQ-8999-C</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Synced Successfully</p>
+</div>
+</div>
+<div class="bg-white border border-outline-variant p-md flex items-center gap-md opacity-50">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">history</span>
+</div>
+<div>
+<p class="text-[11px] font-bold">REQ-8998-B</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Last Sync: 2h ago</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Toast (Hidden by default) -->
+<div class="fixed bottom-lg right-lg bg-inverse-surface text-inverse-on-surface px-lg py-md shadow-2xl translate-y-20 transition-transform duration-300 flex items-center gap-md z-[100]" id="successToast">
+<span class="material-symbols-outlined text-green-400">check_circle</span>
+<div>
+<p class="font-button-text">Data Synchronized</p>
+<p class="text-xs opacity-80">Row successfully added to Google Sheets.</p>
+</div>
+</div>
+<script>
+        function validateAndSimulate() {
+            const btn = document.querySelector('button[onclick="validateAndSimulate()"]');
+            const toast = document.getElementById('successToast');
+            
+            // Visual feedback for click
+            btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> UPLOADING...`;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Restore button
+                btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_upload</span> SUBMIT TO GOOGLE SHEETS`;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                btn.disabled = false;
+
+                // Show toast
+                toast.style.transform = 'translateY(0)';
+                
+                // Clear inputs (simulate reset)
+                document.getElementById('requestForm').reset();
+
+                setTimeout(() => {
+                    toast.style.transform = 'translateY(120%)';
+                }, 4000);
+            }, 1800);
+        }
+
+        // Auto-capitalize inputs as user types to reinforce the "ALL CAPS" constraint
+        document.querySelectorAll('.form-input-caps').forEach(input => {
+            input.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        });
+    </script>
+</body></html>

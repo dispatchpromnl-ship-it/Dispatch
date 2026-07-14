@@ -1,0 +1,14 @@
+{
+  "name": "dispatcher-pro-web",
+  "version": "1.0.0",
+  "description": "Dispatcher Pro - Logistics Request Data Entry Form (Web Version)",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "googleapis": "^144.0.0"
+  }
+}

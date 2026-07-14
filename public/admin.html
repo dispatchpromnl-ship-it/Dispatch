@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light'); }
+    else { document.documentElement.classList.add('light'); document.documentElement.classList.remove('dark'); }
+  })();
+</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ALWEN DISPATCHER PRO — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<style>
+:root, html.light {
+  --color-primary: #00488d;
+  --color-on-primary: #ffffff;
+  --color-surface: #fcf9f8;
+  --color-on-surface: #1b1b1b;
+  --color-surface-container: #f0eded;
+  --color-surface-container-low: #f6f3f2;
+  --color-surface-container-high: #eae7e7;
+  --color-surface-container-highest: #e5e2e1;
+  --color-outline: #727783;
+  --color-outline-variant: #c2c6d4;
+  --color-primary-container: #005fb8;
+  --color-on-primary-container: #cadcff;
+  --color-app-bg: #F3F3F3;
+  --color-error: #ba1a1a;
+}
+html.dark {
+  --color-primary: #a8c8ff;
+  --color-on-primary: #003062;
+  --color-surface: #121318;
+  --color-on-surface: #e2e2e9;
+  --color-surface-container: #1e2027;
+  --color-surface-container-low: #1a1c22;
+  --color-surface-container-high: #2a2c34;
+  --color-surface-container-highest: #33353c;
+  --color-outline: #8c919e;
+  --color-outline-variant: #424752;
+  --color-primary-container: #00468b;
+  --color-on-primary-container: #d6e3ff;
+  --color-app-bg: #121318;
+  --color-error: #ffb4ab;
+}
+body { background-color: var(--color-app-bg); color: var(--color-on-surface); font-family: 'Inter', sans-serif; }
+.dark input, .dark select, .dark textarea {
+  background-color: var(--color-surface-container-low) !important;
+  color: var(--color-on-surface) !important;
+  border-color: var(--color-outline-variant) !important;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+.dark ::-webkit-scrollbar-thumb { background: #424656; }
+</style>
+</head>
+
+<body class="overflow-x-hidden">
+
+<!-- Top Navigation Bar -->
+<header class="bg-[var(--color-surface)] border-b border-[var(--color-outline-variant)] flex justify-between items-center px-4 md:px-6 h-16 w-full fixed top-0 z-50">
+  <div class="flex items-center gap-3">
+    <span class="material-symbols-outlined text-[var(--color-primary)]" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+    <h1 class="text-lg font-semibold text-[var(--color-primary)] hidden sm:block">ADMIN DASHBOARD</h1>
+    <h1 class="text-base font-semibold text-[var(--color-primary)] sm:hidden">ADMIN</h1>
+  </div>
+  <div class="flex items-center gap-3">
+    <a href="/" class="text-xs px-3 py-2 border border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-container-high)] transition-colors flex items-center gap-1">
+      <span class="material-symbols-outlined text-[14px]">form</span> FORM
+    </a>
+    <div id="userInfo" class="text-xs text-right hidden md:block">
+      <p class="font-bold" id="displayName"></p>
+      <p class="text-[10px] text-[var(--color-outline)]">ADMIN</p>
+    </div>
+    <button onclick="logout()" class="text-xs px-3 py-2 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors flex items-center gap-1">
+      <span class="material-symbols-outlined text-[14px]">logout</span> LOGOUT
+    </button>
+    <button id="themeToggleBtn" class="material-symbols-outlined p-2 rounded-full hover:bg-[var(--color-surface-container-high)] transition-colors cursor-pointer" aria-label="Toggle Theme">dark_mode</button>
+  </div>
+</header>
+
+<main class="pt-16 min-h-screen">
+  <div class="max-w-6xl mx-auto p-4 md:p-6">
+
+    <!-- Tab Navigation -->
+    <div class="flex gap-1 mb-6 bg-[var(--color-surface-container)] p-1 border border-[var(--color-outline-variant)]">
+      <button onclick="switchTab('pending')" id="tabPending" class="flex-1 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide transition-all flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">pending_actions</span>
+        Pending Requests <span id="pendingCount" class="bg-[var(--color-primary)] text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span>
+      </button>
+      <button onclick="switchTab('users')" id="tabUsers" class="flex-1 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide transition-all flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">group</span>
+        Manage Users
+      </button>
+    </div>
+
+    <!-- ═══ PENDING REQUESTS TAB ═══ -->
+    <div id="pendingTab">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold">Pending Approval</h2>
+        <button onclick="loadPending()" class="text-xs px-3 py-1.5 border border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-container-high)] transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">refresh</span> REFRESH
+        </button>
+      </div>
+      <div id="pendingList" class="space-y-3">
+        <p class="text-sm text-[var(--color-outline)]">Loading...</p>
+      </div>
+    </div>
+
+    <!-- ═══ MANAGE USERS TAB ═══ -->
+    <div id="usersTab" class="hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold">User Accounts</h2>
+        <div class="flex gap-2">
+          <button onclick="loadUsers()" class="text-xs px-3 py-1.5 border border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-container-high)] transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">refresh</span> REFRESH
+          </button>
+          <button onclick="showAddUserModal()" class="text-xs px-3 py-1.5 bg-[var(--color-primary)] text-white hover:opacity-90 transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">person_add</span> ADD USER
+          </button>
+        </div>
+      </div>
+      <div class="bg-white border border-[var(--color-outline-variant)] overflow-hidden">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="bg-[var(--color-surface-container)] border-b border-[var(--color-outline-variant)]">
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Username</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Display Name</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Role</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Status</th>
+              <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="5" class="px-4 py-6 text-center text-[var(--color-outline)]">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Add User Modal -->
+<div id="addUserModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="closeAddUserModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-[var(--color-outline-variant)] shadow-2xl w-full max-w-md p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold">Add New User</h3>
+      <button onclick="closeAddUserModal()" class="material-symbols-outlined text-[var(--color-outline)] hover:text-[var(--color-on-surface)]">close</button>
+    </div>
+    <form id="addUserForm" class="space-y-3">
+      <div>
+        <label class="block text-[10px] font-bold text-[var(--color-outline)] uppercase mb-1">Username</label>
+        <input type="text" id="newUsername" required class="w-full h-10 px-3 border border-[var(--color-outline-variant)] bg-white text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]" placeholder="USERNAME"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-[var(--color-outline)] uppercase mb-1">Display Name</label>
+        <input type="text" id="newDisplayName" class="w-full h-10 px-3 border border-[var(--color-outline-variant)] bg-white text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]" placeholder="FULL NAME"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-[var(--color-outline)] uppercase mb-1">Password</label>
+        <input type="password" id="newPassword" required minlength="4" class="w-full h-10 px-3 border border-[var(--color-outline-variant)] bg-white text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]" placeholder="MIN 4 CHARACTERS"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-[var(--color-outline)] uppercase mb-1">Role</label>
+        <select id="newRole" class="w-full h-10 px-3 border border-[var(--color-outline-variant)] bg-white text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div id="addUserError" class="hidden text-xs text-red-600 bg-red-50 px-3 py-2 border border-red-200"></div>
+      <div class="flex gap-2 pt-2">
+        <button type="button" onclick="closeAddUserModal()" class="flex-1 h-10 border border-[var(--color-outline-variant)] text-[var(--color-on-surface-variant)] text-xs font-semibold hover:bg-[var(--color-surface-container-high)] transition-colors">CANCEL</button>
+        <button type="submit" id="addUserBtn" class="flex-1 h-10 bg-[var(--color-primary)] text-white text-xs font-semibold hover:opacity-90 transition-colors">ADD USER</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div id="rejectModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="closeRejectModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-[var(--color-outline-variant)] shadow-2xl w-full max-w-md p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold text-red-600">Reject Request</h3>
+      <button onclick="closeRejectModal()" class="material-symbols-outlined text-[var(--color-outline)] hover:text-[var(--color-on-surface)]">close</button>
+    </div>
+    <div>
+      <label class="block text-[10px] font-bold text-[var(--color-outline)] uppercase mb-1">Remarks / Reason</label>
+      <textarea id="rejectRemarks" rows="3" class="w-full px-3 py-2 border border-[var(--color-outline-variant)] bg-white text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]" placeholder="WHY IS THIS BEING REJECTED?"></textarea>
+    </div>
+    <div class="flex gap-2 pt-4">
+      <button onclick="closeRejectModal()" class="flex-1 h-10 border border-[var(--color-outline-variant)] text-xs font-semibold hover:bg-[var(--color-surface-container-high)] transition-colors">CANCEL</button>
+      <button onclick="confirmReject()" id="confirmRejectBtn" class="flex-1 h-10 bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors">REJECT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 right-4 bg-[var(--color-inverse-surface)] text-[var(--color-inverse-on-surface)] px-4 py-3 shadow-2xl translate-y-20 transition-transform duration-300 flex items-center gap-2 z-[100] max-w-[90vw]">
+  <span class="material-symbols-outlined text-green-400" id="toastIcon">check_circle</span>
+  <div>
+    <p class="text-xs font-semibold" id="toastTitle">Success</p>
+    <p class="text-[10px] opacity-80" id="toastMsg"></p>
+  </div>
+</div>
+
+<script>
+// ── Auth Check ───────────────────────────────────────────────────────────────
+const session = JSON.parse(localStorage.getItem('session') || 'null');
+if (!session || session.role !== 'admin') {
+  window.location.href = '/login.html';
+} else {
+  window.location.href = '/'; // Redirect to unified main page
+}
+
+const APPROVE_URL = '/api/approve';
+const USERS_URL = '/api/users';
+
+document.getElementById('displayName').textContent = session?.displayName || 'Admin';
+
+let currentRejectRow = null;
+
+// ── Toast ────────────────────────────────────────────────────────────────────
+function showToast(title, msg, isError) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').textContent = isError ? 'error' : 'check_circle';
+  document.getElementById('toastIcon').className = isError
+    ? 'material-symbols-outlined text-red-400'
+    : 'material-symbols-outlined text-green-400';
+  toast.style.transform = 'translateY(0)';
+  setTimeout(() => { toast.style.transform = 'translateY(120%)'; }, 3500);
+}
+
+// ── Tab Switching ────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  const pendingTab = document.getElementById('pendingTab');
+  const usersTab = document.getElementById('usersTab');
+  const tabPending = document.getElementById('tabPending');
+  const tabUsers = document.getElementById('tabUsers');
+
+  if (tab === 'pending') {
+    pendingTab.classList.remove('hidden');
+    usersTab.classList.add('hidden');
+    tabPending.className = 'flex-1 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide transition-all flex items-center justify-center gap-2 bg-[var(--color-primary)] text-white';
+    tabUsers.className = 'flex-1 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide transition-all flex items-center justify-center gap-2 hover:bg-[var(--color-surface-container-high)]';
+    loadPending();
+  } else {
+    pendingTab.classList.add('hidden');
+    usersTab.classList.remove('hidden');
+    tabUsers.className = 'flex-1 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide transition-all flex items-center justify-center gap-2 bg-[var(--color-primary)] text-white';
+    tabPending.className = 'flex-1 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide transition-all flex items-center justify-center gap-2 hover:bg-[var(--color-surface-container-high)]';
+    loadUsers();
+  }
+}
+
+// ── Load Pending Requests ────────────────────────────────────────────────────
+async function loadPending() {
+  const list = document.getElementById('pendingList');
+  list.innerHTML = '<p class="text-sm text-[var(--color-outline)]">Loading...</p>';
+
+  try {
+    const res = await fetch(`${APPROVE_URL}?role=admin`);
+    const data = await res.json();
+
+    if (!data.success) {
+      list.innerHTML = `<p class="text-sm text-red-500">${data.error}</p>`;
+      return;
+    }
+
+    const pending = data.requests.filter(r => r.status === 'PENDING');
+    const reviewed = data.requests.filter(r => r.status !== 'PENDING');
+
+    document.getElementById('pendingCount').textContent = pending.length;
+
+    let html = '';
+
+    if (pending.length === 0 && reviewed.length === 0) {
+      html = '<p class="text-sm text-[var(--color-outline)] text-center py-8">No requests yet.</p>';
+    }
+
+    // Pending items first
+    pending.forEach(r => {
+      html += renderRequestCard(r, true);
+    });
+
+    // Then reviewed
+    reviewed.reverse().forEach(r => {
+      html += renderRequestCard(r, false);
+    });
+
+    list.innerHTML = html;
+  } catch (err) {
+    list.innerHTML = `<p class="text-sm text-red-500">Error loading requests.</p>`;
+  }
+}
+
+function renderRequestCard(r, isPending) {
+  const statusColor = r.status === 'APPROVED' ? 'bg-green-100 text-green-700'
+    : r.status === 'REJECTED' ? 'bg-red-100 text-red-700'
+    : 'bg-yellow-100 text-yellow-700';
+
+  const actions = isPending ? `
+    <div class="flex gap-2 mt-3">
+      <button onclick="approveRequest(${r.row})" class="flex-1 h-9 bg-green-600 text-white text-[11px] font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined text-[14px]">check</span> APPROVE
+      </button>
+      <button onclick="openRejectModal(${r.row})" class="flex-1 h-9 bg-red-50 text-red-600 border border-red-200 text-[11px] font-semibold hover:bg-red-100 transition-colors flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined text-[14px]">close</span> REJECT
+      </button>
+    </div>
+  ` : '';
+
+  const reviewInfo = !isPending ? `
+    <div class="mt-2 text-[10px] text-[var(--color-outline)]">
+      ${r.status === 'APPROVED' ? 'Approved' : 'Rejected'} by ${r.reviewedBy || 'admin'} ${r.reviewedAt ? 'at ' + r.reviewedAt : ''}
+      ${r.adminRemarks ? '<br>Remarks: ' + r.adminRemarks : ''}
+    </div>
+  ` : '';
+
+  return `
+    <div class="bg-white border border-[var(--color-outline-variant)] p-4 ${!isPending ? 'opacity-70' : ''}">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <p class="text-[11px] font-bold">${r.jobId || 'NO JOB ID'}</p>
+          <p class="text-[10px] text-[var(--color-outline)]">${r.dateRequested || ''} &middot; Submitted by ${r.submittedBy}</p>
+        </div>
+        <span class="text-[10px] font-bold px-2 py-0.5 ${statusColor}">${r.status}</span>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] mt-2">
+        <div><span class="text-[var(--color-outline)]">PARTICULARS:</span> <span class="font-medium">${r.particulars || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">CONSIGNEE:</span> <span class="font-medium">${r.consignee || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">SUPPLIER:</span> <span class="font-medium">${r.supplierName || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">AMOUNT:</span> <span class="font-medium">${r.totalAmount ? '₱' + Number(r.totalAmount).toLocaleString() : '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">MBL:</span> <span class="font-medium">${r.mbl || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">HBL:</span> <span class="font-medium">${r.hbl || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">CONTAINER:</span> <span class="font-medium">${r.containerNumber || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">BANK:</span> <span class="font-medium">${r.bankName || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">PAYMENT:</span> <span class="font-medium">${r.paymentStatus || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">REQUESTED BY:</span> <span class="font-medium">${r.requestedBy || '-'}</span></div>
+        <div><span class="text-[var(--color-outline)]">ACCOUNT NO:</span> <span class="font-medium">${r.accountNo || '-'}</span></div>
+      </div>
+      ${reviewInfo}
+      ${actions}
+    </div>
+  `;
+}
+
+// ── Approve ──────────────────────────────────────────────────────────────────
+async function approveRequest(row) {
+  try {
+    const res = await fetch(APPROVE_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ row, action: 'approve', reviewedBy: session.username }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Approved', 'Request synced to database.', false);
+      loadPending();
+    } else {
+      showToast('Error', data.error, true);
+    }
+  } catch {
+    showToast('Error', 'Network error.', true);
+  }
+}
+
+// ── Reject ───────────────────────────────────────────────────────────────────
+function openRejectModal(row) {
+  currentRejectRow = row;
+  document.getElementById('rejectRemarks').value = '';
+  document.getElementById('rejectModal').classList.remove('hidden');
+}
+
+function closeRejectModal() {
+  document.getElementById('rejectModal').classList.add('hidden');
+  currentRejectRow = null;
+}
+
+async function confirmReject() {
+  const remarks = document.getElementById('rejectRemarks').value.trim();
+  if (!remarks) {
+    alert('Please provide a reason for rejection.');
+    return;
+  }
+
+  try {
+    const res = await fetch(APPROVE_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ row: currentRejectRow, action: 'reject', remarks, reviewedBy: session.username }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Rejected', 'Request has been rejected.', false);
+      closeRejectModal();
+      loadPending();
+    } else {
+      showToast('Error', data.error, true);
+    }
+  } catch {
+    showToast('Error', 'Network error.', true);
+  }
+}
+
+// ── Load Users ───────────────────────────────────────────────────────────────
+async function loadUsers() {
+  const tbody = document.getElementById('usersTableBody');
+  try {
+    const res = await fetch(USERS_URL);
+    const data = await res.json();
+
+    if (!data.success || data.users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-[var(--color-outline)]">No users found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.users.map(u => `
+      <tr class="border-b border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-container-low)]">
+        <td class="px-4 py-3 font-medium">${u.username}</td>
+        <td class="px-4 py-3">${u.displayName}</td>
+        <td class="px-4 py-3">
+          <span class="px-2 py-0.5 text-[10px] font-bold uppercase ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${u.role}</span>
+        </td>
+        <td class="px-4 py-3">
+          <span class="px-2 py-0.5 text-[10px] font-bold uppercase ${u.active === 'YES' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${u.active === 'YES' ? 'Active' : 'Inactive'}</span>
+        </td>
+        <td class="px-4 py-3">
+          <div class="flex gap-1">
+            <button onclick="toggleUserActive(${u.row}, '${u.active}')" class="text-[10px] px-2 py-1 border border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-container-high)] transition-colors">
+              ${u.active === 'YES' ? 'DEACTIVATE' : 'ACTIVATE'}
+            </button>
+            <button onclick="resetPassword(${u.row}, '${u.username}')" class="text-[10px] px-2 py-1 border border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-container-high)] transition-colors">
+              RESET PASS
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-red-500">Error loading users.</td></tr>';
+  }
+}
+
+// ── Toggle User Active ───────────────────────────────────────────────────────
+async function toggleUserActive(row, currentActive) {
+  const newActive = currentActive === 'YES' ? 'NO' : 'YES';
+  try {
+    const res = await fetch(USERS_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ row, active: newActive }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Updated', `User ${newActive === 'YES' ? 'activated' : 'deactivated'}.`, false);
+      loadUsers();
+    } else {
+      showToast('Error', data.error, true);
+    }
+  } catch {
+    showToast('Error', 'Network error.', true);
+  }
+}
+
+// ── Reset Password ───────────────────────────────────────────────────────────
+async function resetPassword(row, username) {
+  const newPass = prompt(`Enter new password for ${username}:`);
+  if (!newPass || newPass.length < 4) {
+    if (newPass !== null) alert('Password must be at least 4 characters.');
+    return;
+  }
+
+  try {
+    const res = await fetch(USERS_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ row, password: newPass }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Updated', 'Password has been reset.', false);
+    } else {
+      showToast('Error', data.error, true);
+    }
+  } catch {
+    showToast('Error', 'Network error.', true);
+  }
+}
+
+// ── Add User ─────────────────────────────────────────────────────────────────
+function showAddUserModal() {
+  document.getElementById('addUserModal').classList.remove('hidden');
+  document.getElementById('addUserForm').reset();
+  document.getElementById('addUserError').classList.add('hidden');
+}
+
+function closeAddUserModal() {
+  document.getElementById('addUserModal').classList.add('hidden');
+}
+
+document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('addUserError');
+  errEl.classList.add('hidden');
+
+  const username = document.getElementById('newUsername').value.trim();
+  const displayName = document.getElementById('newDisplayName').value.trim();
+  const password = document.getElementById('newPassword').value;
+  const role = document.getElementById('newRole').value;
+
+  const btn = document.getElementById('addUserBtn');
+  btn.textContent = 'ADDING...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(USERS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, displayName, role }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      showToast('User Added', `${username} has been created.`, false);
+      closeAddUserModal();
+      loadUsers();
+    } else {
+      errEl.textContent = data.error;
+      errEl.classList.remove('hidden');
+    }
+  } catch {
+    errEl.textContent = 'Network error.';
+    errEl.classList.remove('hidden');
+  } finally {
+    btn.textContent = 'ADD USER';
+    btn.disabled = false;
+  }
+});
+
+// ── Logout ───────────────────────────────────────────────────────────────────
+function logout() {
+  localStorage.removeItem('session');
+  window.location.href = '/login.html';
+}
+
+// ── Theme Toggle ─────────────────────────────────────────────────────────────
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+function updateThemeUI(theme) {
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light');
+    themeToggleBtn.textContent = 'light_mode';
+  } else {
+    document.documentElement.classList.add('light');
+    document.documentElement.classList.remove('dark');
+    themeToggleBtn.textContent = 'dark_mode';
+  }
+}
+const currentTheme = localStorage.getItem('theme') || 'light';
+updateThemeUI(currentTheme);
+themeToggleBtn.addEventListener('click', () => {
+  const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+  localStorage.setItem('theme', newTheme);
+  updateThemeUI(newTheme);
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+switchTab('pending');
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; padding: 12px; }
+      label { display: block; margin-top: 12px; font-weight: bold; }
+      input { width: 100%; padding: 8px; box-sizing: border-box; margin-top: 4px; }
+      button { margin-top: 16px; padding: 10px 14px; font-size: 14px; }
+      #status { margin-top: 12px; color: #1a73e8; }
+    </style>
+  </head>
+  <body>
+    <h2>Data Entry</h2>
+    <div id="fields"></div>
+    <button onclick="submitData()">Save Entry</button>
+    <p id="status"></p>
+
+    <script>
+      function buildFields(headers) {
+        const container = document.getElementById('fields');
+        container.innerHTML = '';
+        headers.forEach(header => {
+          const label = document.createElement('label');
+          label.textContent = header;
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.name = header;
+          input.placeholder = 'Enter ' + header;
+
+          container.appendChild(label);
+          container.appendChild(input);
+        });
+      }
+
+      function submitData() {
+        const inputs = document.querySelectorAll('#fields input');
+        const data = {};
+        inputs.forEach(input => data[input.name] = input.value);
+
+        google.script.run.withSuccessHandler(message => {
+          document.getElementById('status').textContent = message;
+          inputs.forEach(i => i.value = '');
+        }).submitEntry(data);
+      }
+
+      google.script.run.withSuccessHandler(buildFields).getSheetHeaders();
+    </script>
+  </body>
+</html>
