@@ -161,11 +161,17 @@ form.addEventListener('submit', async (e) => {
 
   try {
     console.log('Sending login request to:', LOGIN_URL);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout for Vercel cold starts
+
     const response = await fetch(LOGIN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     console.log('Login response status:', response.status);
     const contentType = response.headers.get('content-type') || '';
@@ -176,7 +182,7 @@ form.addEventListener('submit', async (e) => {
     } else {
       const errorText = await response.text();
       console.error('Non-JSON response received from login endpoint:', errorText);
-      showError(`Server Error (${response.status}): ${errorText.substring(0, 150) || 'Check Vercel logs'}`);
+      showError(`Server Error (${response.status}): ${errorText.substring(0, 200) || 'Check Vercel function logs.'}`);
       return;
     }
 
@@ -193,7 +199,11 @@ form.addEventListener('submit', async (e) => {
     }
   } catch (err) {
     console.error('Login request failed:', err);
-    showError(`Network/Client Error: ${err.message || 'Check your connection.'}`);
+    if (err.name === 'AbortError') {
+      showError('Request timed out. The server is taking too long to respond. Please try again.');
+    } else {
+      showError(`Login failed: ${err.message || 'Unable to reach the server. Check your connection.'}`);
+    }
   } finally {
     loginBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">login</span> SIGN IN`;
     loginBtn.disabled = false;
