@@ -612,7 +612,13 @@ async function safeFetchJson(url, options = {}) {
     if (!contentType.includes('application/json')) {
       const text = await res.text();
       console.error(`Non-JSON response from ${url}:`, text);
-      throw new Error(`Server Error (${res.status}): ${text.substring(0, 100) || 'Unknown error'}`);
+      
+      // Detect Kaspersky/antivirus interception
+      if (text.includes('Kaspersky') || text.includes('data-theme="&UiTheme&"') || text.includes('Anti-Virus')) {
+        throw new Error('⚠️ Your antivirus is blocking this connection. Please add this site to your trusted zone or disable Web Anti-Virus temporarily.');
+      }
+      
+      throw new Error(`Server Error (${res.status}): Unable to reach server. Check your network or antivirus settings.`);
     }
     return await res.json();
   } catch (err) {

@@ -182,7 +182,14 @@ form.addEventListener('submit', async (e) => {
     } else {
       const errorText = await response.text();
       console.error('Non-JSON response received from login endpoint:', errorText);
-      showError(`Server Error (${response.status}): ${errorText.substring(0, 200) || 'Check Vercel function logs.'}`);
+      
+      // Detect Kaspersky/antivirus interception
+      if (errorText.includes('Kaspersky') || errorText.includes('data-theme="&UiTheme&"') || errorText.includes('Anti-Virus')) {
+        showError('⚠️ Your antivirus (Kaspersky) is blocking this connection. Please add this site to your antivirus trusted zone or disable Web Anti-Virus temporarily.');
+        return;
+      }
+      
+      showError(`Server Error (${response.status}): Unable to reach the server. Check your network connection or try disabling your antivirus.`);
       return;
     }
 
