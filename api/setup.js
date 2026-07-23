@@ -7,8 +7,8 @@ const {
   PENDING_COLUMNS, DB_COLUMNS,
 } = require('./_lib/constants');
 
-const SETUP_SECRET   = 'DISPATCH_PRO_SETUP_2026';
-const USER_HEADERS   = ['USERNAME', 'PASSWORD', 'ROLE', 'DISPLAY_NAME', 'ACTIVE', 'CREATED'];
+const SETUP_SECRET = process.env.SETUP_SECRET || 'DISPATCH_PRO_SETUP_2026';
+const USER_HEADERS = ['USERNAME', 'PASSWORD', 'ROLE', 'DISPLAY_NAME', 'ACTIVE', 'CREATED'];
 
 const DEFAULT_USERS = [
   ['ADMIN1', 'admin123', 'admin', 'ADMIN ONE'],
