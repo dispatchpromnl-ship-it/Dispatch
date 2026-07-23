@@ -1,31 +1,19 @@
-const { google } = require('googleapis');
-
-const SPREADSHEET_ID = '1dOlu7346uncivzoAhGKXtR4HbwTSjzQNUilOzhYUB_g';
-
-function cors(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-}
+const { getSheetsClient }       = require('./_lib/sheets');
+const { cors }                  = require('./_lib/cors');
+const { SPREADSHEET_ID, SHEET } = require('./_lib/constants');
 
 module.exports = async function handler(req, res) {
-  cors(res);
+  cors(res, 'POST, OPTIONS');
   res.setHeader('Cache-Control', 'no-store, max-age=0');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'POST only' });
 
   try {
-    const rawCreds = process.env.GOOGLE_CREDENTIALS;
-    if (!rawCreds) return res.status(500).json({ error: 'GOOGLE_CREDENTIALS not set.' });
-
-    const credentials = JSON.parse(rawCreds);
-    const auth = new google.auth.GoogleAuth({ credentials, scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
-    const sheets = google.sheets({ version: 'v4', auth });
-
+    const sheets  = getSheetsClient();
     const results = {};
 
-    for (const sheetName of ['PENDING', 'DATABASE']) {
+    for (const sheetName of [SHEET.PENDING, SHEET.DATABASE]) {
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
         range: `${sheetName}!A1:Z`,
@@ -37,24 +25,23 @@ module.exports = async function handler(req, res) {
         continue;
       }
 
-      const header = rows[0];
-      const jobIdCol = header.indexOf('JOB ID');
+      const header    = rows[0];
+      const jobIdCol  = header.indexOf('JOB ID');
       if (jobIdCol === -1) {
         results[sheetName] = { error: 'JOB ID column not found' };
         continue;
       }
 
       const dataRows = rows.slice(1);
-      const before = dataRows.length;
+      const before   = dataRows.length;
 
-      const seen = new Set();
-      const unique = [];
-      for (const row of dataRows) {
+      const seen   = new Set();
+      const unique = dataRows.filter(row => {
         const jobId = (row[jobIdCol] || '').trim().toUpperCase();
-        if (jobId && seen.has(jobId)) continue;
+        if (jobId && seen.has(jobId)) return false;
         if (jobId) seen.add(jobId);
-        unique.push(row);
-      }
+        return true;
+      });
 
       const removed = before - unique.length;
 
@@ -76,8 +63,9 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(200).json({ success: true, results });
+
   } catch (err) {
-    console.error('[cleanup] Error:', err.message);
-    return res.status(500).json({ error: err.message });
+    console.error('[cleanup]', err.message);
+    return res.status(err.statusCode || 500).json({ success: false, error: err.message });
   }
 };

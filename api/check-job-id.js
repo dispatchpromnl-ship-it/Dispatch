@@ -1,57 +1,35 @@
-const { google } = require('googleapis');
-
-const SPREADSHEET_ID = '1dOlu7346uncivzoAhGKXtR4HbwTSjzQNUilOzhYUB_g';
-const PENDING_SHEET = 'PENDING';
-const DATABASE_SHEET = 'DATABASE';
-
-function cors(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-}
+const { getSheetsClient }       = require('./_lib/sheets');
+const { cors }                  = require('./_lib/cors');
+const { SPREADSHEET_ID, SHEET } = require('./_lib/constants');
 
 module.exports = async function handler(req, res) {
-  cors(res);
+  cors(res, 'GET, OPTIONS');
   res.setHeader('Cache-Control', 'no-store, max-age=0');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
-    const rawCreds = process.env.GOOGLE_CREDENTIALS;
-    if (!rawCreds) return res.status(500).json({ error: 'GOOGLE_CREDENTIALS not set.' });
+    const sheets = getSheetsClient();
 
-    const credentials = JSON.parse(rawCreds);
-    const auth = new google.auth.GoogleAuth({ credentials, scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
-    const sheets = google.sheets({ version: 'v4', auth });
+    const [pendingRes, dbRes] = await Promise.allSettled([
+      sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${SHEET.PENDING}!B:B` }),
+      sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${SHEET.DATABASE}!B:B` }),
+    ]);
 
-    let pendingIds = [];
-    let dbIds = [];
+    const toIds = result =>
+      result.status === 'fulfilled'
+        ? (result.value.data.values || []).slice(1).map(r => (r[0] || '').trim().toUpperCase()).filter(Boolean)
+        : [];
 
-    try {
-      const pendingRes = await sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID, range: `${PENDING_SHEET}!B:B`,
-      });
-      pendingIds = (pendingRes.data.values || []).slice(1).map(r => (r[0] || '').trim().toUpperCase()).filter(Boolean);
-    } catch (e) { console.error('[check-job-id] PENDING read failed:', e.message); }
+    const pendingIds = toIds(pendingRes);
+    const dbIds      = toIds(dbRes);
+    const allIds     = [...new Set([...pendingIds, ...dbIds])];
 
-    try {
-      const dbRes = await sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID, range: `${DATABASE_SHEET}!B:B`,
-      });
-      dbIds = (dbRes.data.values || []).slice(1).map(r => (r[0] || '').trim().toUpperCase()).filter(Boolean);
-    } catch (e) { console.error('[check-job-id] DATABASE read failed:', e.message); }
+    return res.status(200).json({ success: true, pendingIds, dbIds, allIds });
 
-    const allIds = [...new Set([...pendingIds, ...dbIds])];
-
-    return res.status(200).json({
-      success: true,
-      pendingIds,
-      dbIds,
-      allIds,
-    });
   } catch (err) {
-    console.error('[check-job-id] Error:', err.message);
-    return res.status(500).json({ error: err.message });
+    console.error('[check-job-id]', err.message);
+    return res.status(err.statusCode || 500).json({ success: false, error: err.message });
   }
 };
