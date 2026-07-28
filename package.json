@@ -4,7 +4,7 @@
   "description": "Dispatcher Pro - Logistics Request Data Entry Form (Web Version)",
   "private": true,
   "engines": {
-    "node": ">=18.x"
+    "node": "18.x"
   },
   "scripts": {
     "dev": "node server.js",
