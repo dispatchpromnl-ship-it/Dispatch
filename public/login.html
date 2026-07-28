@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    } else {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    }
+  })();
+</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ALWEN DISPATCHER PRO — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+<style>
+:root, html.light {
+  --color-primary: #00488d;
+  --color-on-primary: #ffffff;
+  --color-surface: #fcf9f8;
+  --color-on-surface: #1b1b1b;
+  --color-surface-container: #f0eded;
+  --color-surface-container-low: #f6f3f2;
+  --color-surface-container-high: #eae7e7;
+  --color-surface-container-lowest: #ffffff;
+  --color-outline: #727783;
+  --color-outline-variant: #c2c6d4;
+  --color-primary-container: #005fb8;
+  --color-on-primary-container: #cadcff;
+  --color-app-bg: #F3F3F3;
+  --color-input-bg: #ffffff;
+  --color-input-border: #D1D1D1;
+  --color-status-red-bg: #fee2e2;
+  --color-status-red-text: #b91c1c;
+}
+
+html.dark {
+  --color-primary: #a8c8ff;
+  --color-on-primary: #003062;
+  --color-surface: #121318;
+  --color-on-surface: #e2e2e9;
+  --color-surface-container: #1e2027;
+  --color-surface-container-low: #1a1c22;
+  --color-surface-container-high: #2a2c34;
+  --color-surface-container-lowest: #14161a;
+  --color-outline: #8c919e;
+  --color-outline-variant: #424752;
+  --color-primary-container: #00468b;
+  --color-on-primary-container: #d6e3ff;
+  --color-app-bg: #0c0d12;
+  --color-input-bg: #14161a;
+  --color-input-border: #424752;
+  --color-status-red-bg: #7f1d1d;
+  --color-status-red-text: #fca5a5;
+}
+
+body {
+  background-color: var(--color-app-bg);
+  color: var(--color-on-surface);
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.card-surface { background-color: var(--color-surface-container-lowest); border: 1px solid var(--color-outline-variant); border-radius: 0.75rem; }
+.form-input { background-color: var(--color-input-bg); border: 1px solid var(--color-input-border); border-radius: 0.5rem; }
+.form-input:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 1px var(--color-primary); }
+.btn-primary { background-color: var(--color-primary); color: var(--color-on-primary); border-radius: 0.5rem; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { transform: scale(0.98); }
+</style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Logo & Header -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <div class="h-16 flex items-center justify-center bg-surface-container-lowest px-4 py-2 rounded-lg border border-outline-variant">
+          <img src="./agx-logo.png" alt="AGX Logo" class="h-12 object-contain" />
+        </div>
+      </div>
+      <h1 class="text-2xl font-bold text-[var(--color-primary)]">ALWEN DISPATCHER PRO</h1>
+      <p class="text-sm text-[var(--color-outline)] mt-1">Enterprise Logistics System</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="card-surface shadow-lg p-8">
+      <div class="flex items-center gap-2 mb-6">
+        <span class="material-symbols-outlined text-[var(--color-primary)]">lock</span>
+        <h2 class="text-lg font-semibold">Sign In</h2>
+      </div>
+
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wide">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            autocomplete="username"
+            placeholder="Enter your username"
+            class="w-full h-11 px-4 form-input text-sm transition-all"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wide">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            class="w-full h-11 px-4 form-input text-sm transition-all"
+          />
+        </div>
+
+        <div id="errorMsg" class="hidden bg-status-red-bg border border-status-red-bg text-status-red-text px-4 py-3 text-sm rounded-lg"></div>
+
+        <button
+          type="submit"
+          id="loginBtn"
+          class="w-full h-11 btn-primary font-semibold transition-all flex items-center justify-center gap-2"
+        >
+          <span class="material-symbols-outlined text-[18px]">login</span>
+          SIGN IN
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-xs text-on-surface-variant opacity-60 mt-6">&copy; 2026 ALWEN DISPATCHER PRO. All rights reserved.</p>
+  </div>
+
+<script>
+const LOGIN_URL = '/api/login';
+
+// Check if already logged in
+const session = JSON.parse(localStorage.getItem('session') || 'null');
+if (session && session.username) {
+  window.location.href = '/';
+}
+
+const form = document.getElementById('loginForm');
+const errorMsg = document.getElementById('errorMsg');
+const loginBtn = document.getElementById('loginBtn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorMsg.classList.add('hidden');
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+
+  if (!username || !password) {
+    showError('Please enter both username and password.');
+    return;
+  }
+
+  loginBtn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> SIGNING IN...`;
+  loginBtn.disabled = true;
+
+  try {
+    console.log('Sending login request to:', LOGIN_URL);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout for Vercel cold starts
+
+    const response = await fetch(LOGIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    console.log('Login response status:', response.status);
+    const contentType = response.headers.get('content-type') || '';
+    let result;
+
+    if (contentType.includes('application/json')) {
+      result = await response.json();
+    } else {
+      const errorText = await response.text();
+      console.error('Non-JSON response received from login endpoint:', errorText);
+      
+      // Detect Kaspersky/antivirus interception
+      if (errorText.includes('Kaspersky') || errorText.includes('data-theme="&UiTheme&"') || errorText.includes('Anti-Virus')) {
+        showError('⚠️ Your antivirus (Kaspersky) is blocking this connection. Please add this site to your antivirus trusted zone or disable Web Anti-Virus temporarily.');
+        return;
+      }
+      
+      showError(`Server Error (${response.status}): Unable to reach the server. Check your network connection or try disabling your antivirus.`);
+      return;
+    }
+
+    if (result.success) {
+      localStorage.setItem('session', JSON.stringify({
+        username: result.username,
+        displayName: result.displayName,
+        role: result.role,
+        loginTime: new Date().toISOString(),
+      }));
+      window.location.href = '/';
+    } else {
+      showError(result.error || 'Invalid credentials. Please try again.');
+    }
+  } catch (err) {
+    console.error('Login request failed:', err);
+    if (err.name === 'AbortError') {
+      showError('Request timed out. The server is taking too long to respond. Please try again.');
+    } else {
+      showError(`Login failed: ${err.message || 'Unable to reach the server. Check your connection.'}`);
+    }
+  } finally {
+    loginBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">login</span> SIGN IN`;
+    loginBtn.disabled = false;
+  }
+});
+
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorMsg.classList.remove('hidden');
+}
+</script>
+</body>
+</html>
