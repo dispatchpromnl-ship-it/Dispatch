@@ -59,9 +59,14 @@ module.exports = async function handler(req, res) {
     // ── USERS: write headers + default accounts if empty ────────────────
     const usersData = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET.USERS}!A1:A1`,
+      range: `${SHEET.USERS}!A1:F`,
     });
-    if (!usersData.data.values || usersData.data.values.length === 0) {
+    const existingRows = usersData.data.values || [];
+    const hasHeaders = existingRows.length > 0;
+    const hasUsers = existingRows.length > 1;
+
+    if (!hasHeaders) {
+      // Sheet doesn't exist or is completely empty — write headers + users
       const rows = DEFAULT_USERS.map(([u, p, r, d]) => [
         u, hashPassword(p), r, d, 'YES', now,
       ]);
@@ -71,6 +76,20 @@ module.exports = async function handler(req, res) {
         valueInputOption: 'RAW',
         requestBody: { values: [USER_HEADERS, ...rows] },
       });
+    } else if (!hasUsers) {
+      // Headers exist but no user rows — append users
+      const rows = DEFAULT_USERS.map(([u, p, r, d]) => [
+        u, hashPassword(p), r, d, 'YES', now,
+      ]);
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `${SHEET.USERS}!A1`,
+        valueInputOption: 'RAW',
+        requestBody: { values: rows },
+      });
+    } else {
+      // Users already exist — log and skip
+      console.log('[setup.js] USERS sheet already has', existingRows.length - 1, 'user(s). Skipping default user creation.');
     }
 
     // ── PENDING / DATABASE / AUDIT_LOG: ensure headers only ─────────────

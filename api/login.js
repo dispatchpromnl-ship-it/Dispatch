@@ -18,14 +18,21 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Username and password required.' });
     }
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET.USERS}!A1:F`,
-    });
+    let response;
+    try {
+      response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `${SHEET.USERS}!A1:F`,
+      });
+    } catch (sheetErr) {
+      console.error('[login.js] Failed to read USERS sheet:', sheetErr.message);
+      return res.status(500).json({ success: false, error: 'Cannot connect to database. GOOGLE_CREDENTIALS may be missing or invalid. Run /api/setup first.' });
+    }
 
     const rows = response.data.values || [];
     if (rows.length <= 1) {
-      return res.status(401).json({ success: false, error: 'No users found. Contact admin.' });
+      console.warn('[login.js] USERS sheet is empty or has no user rows. Run /api/setup with SETUP_SECRET to create accounts.');
+      return res.status(401).json({ success: false, error: 'No users found. Run setup first or contact admin.' });
     }
 
     // Build user objects from headers
@@ -36,11 +43,14 @@ module.exports = async function handler(req, res) {
       return user;
     });
 
+    console.log(`[login.js] Login attempt for "${username}" — ${users.length} user(s) in sheet`);
+
     const user = users.find(u =>
       u['USERNAME'] && u['USERNAME'].toLowerCase() === username.toLowerCase()
     );
 
     if (!user) {
+      console.warn(`[login.js] No matching user for "${username}"`);
       return res.status(401).json({ success: false, error: 'Invalid username or password.' });
     }
 
@@ -48,7 +58,14 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ success: false, error: 'Account is deactivated. Contact admin.' });
     }
 
-    if (!verifyPassword(password, user['PASSWORD'])) {
+    const storedHash = user['PASSWORD'];
+    if (!storedHash) {
+      console.error(`[login.js] User "${username}" has no password hash in sheet.`);
+      return res.status(500).json({ success: false, error: 'Account data corrupted. Re-run setup.' });
+    }
+
+    if (!verifyPassword(password, storedHash)) {
+      console.warn(`[login.js] Password mismatch for "${username}" — stored hash starts with: ${storedHash.substring(0, 7)}`);
       return res.status(401).json({ success: false, error: 'Invalid username or password.' });
     }
 
