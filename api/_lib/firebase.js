@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { getStorage } = require('firebase-admin/storage');
 
 let app = null;
 
@@ -31,7 +32,7 @@ function getFirebaseApp() {
 
 function getStorageBucket() {
   const firebaseApp = getFirebaseApp();
-  return admin.storage(firebaseApp).bucket();
+  return getStorage(firebaseApp).bucket();
 }
 
 module.exports = { getFirebaseApp, getStorageBucket };
