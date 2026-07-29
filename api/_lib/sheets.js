@@ -1,8 +1,7 @@
-// ── Google Sheets & Drive auth & client factory ─────────────────────────────
+// ── Google Sheets auth & client factory ────────────────────────────────────
 const { google } = require('googleapis');
 
-const GOOGLE_DRIVE_FOLDER_ID = '1BfH5MpVB9ace6bFsyosvNbOwFpm5JIcL';
-const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024; // 3MB (base64 inflates ~33%, stays under Vercel 4.5MB limit)
+const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024;
 const ALLOWED_MIME_TYPES = [
   'application/pdf',
   'image/jpeg',
@@ -52,15 +51,6 @@ function createAuth(scopes) {
 function getSheetsClient() {
   const auth = createAuth(['https://www.googleapis.com/auth/spreadsheets']);
   return google.sheets({ version: 'v4', auth });
-}
-
-/**
- * Returns an authenticated Google Drive client.
- * @returns {import('googleapis').drive_v3.Drive}
- */
-function getDriveClient() {
-  const auth = createAuth(['https://www.googleapis.com/auth/drive.file']);
-  return google.drive({ version: 'v3', auth });
 }
 
 // ── Column rename migrations ────────────────────────────────────────────────
@@ -118,6 +108,6 @@ async function ensureHeaders(sheets, spreadsheetId, sheetName, headers) {
 }
 
 module.exports = {
-  getSheetsClient, getDriveClient, ensureHeaders,
-  GOOGLE_DRIVE_FOLDER_ID, MAX_FILE_SIZE_BYTES, ALLOWED_MIME_TYPES,
+  getSheetsClient, ensureHeaders,
+  MAX_FILE_SIZE_BYTES, ALLOWED_MIME_TYPES,
 };

@@ -1,4 +1,5 @@
-const { getDriveClient, GOOGLE_DRIVE_FOLDER_ID, MAX_FILE_SIZE_BYTES, ALLOWED_MIME_TYPES } = require('./_lib/sheets');
+const { getStorageBucket } = require('./_lib/firebase');
+const { ALLOWED_MIME_TYPES, MAX_FILE_SIZE_BYTES } = require('./_lib/sheets');
 const { cors } = require('./_lib/cors');
 
 module.exports = async function handler(req, res) {
@@ -30,34 +31,28 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const drive = getDriveClient();
+    const bucket = getStorageBucket();
 
-    // Sanitize filename: timestamp prefix to avoid collisions
     const ts = Date.now();
     const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
     const uploadName = `${ts}_${safeName}`;
 
-    const response = await drive.files.create({
-      requestBody: {
-        name: uploadName,
-        parents: [GOOGLE_DRIVE_FOLDER_ID],
-      },
-      media: {
-        mimeType,
-        body: require('stream').Readable.from(buffer),
-      },
-      fields: 'id, webViewLink, webContentLink',
+    const fileRef = bucket.file(uploadName);
+
+    await fileRef.save(buffer, {
+      metadata: { contentType: mimeType },
     });
 
-    const fileId = response.data.id;
-    const fileUrl = response.data.webViewLink || `https://drive.google.com/file/d/${fileId}/view`;
+    await fileRef.makePublic();
 
-    console.log(`[upload] File uploaded: ${uploadName} (${(buffer.length / 1024).toFixed(0)}KB) → ${fileId}`);
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${encodeURIComponent(uploadName)}`;
+
+    console.log(`[upload] File uploaded: ${uploadName} (${(buffer.length / 1024).toFixed(0)}KB) → ${bucket.name}`);
 
     return res.status(200).json({
       success: true,
-      fileId,
-      fileUrl,
+      fileId: uploadName,
+      fileUrl: publicUrl,
       fileName: safeName,
     });
 
