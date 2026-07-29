@@ -19,6 +19,8 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-storage-compat.js"></script>
 <script>
 tailwind.config = {
   darkMode: "class",
@@ -605,6 +607,19 @@ header, aside, main, div, button, input, select, textarea, a, h1, h2, p, span { 
 const session = JSON.parse(localStorage.getItem('session') || 'null');
 if (!session || !session.username) { window.location.href = '/login.html'; }
 
+// ── Firebase Init ─────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyA4kVYd-X0xISwgjdqxPXh9x6HdDHne-k8",
+  authDomain: "agx-dispatch.firebaseapp.com",
+  projectId: "agx-dispatch",
+  storageBucket: "agx-dispatch.firebasestorage.app",
+  messagingSenderId: "818601011414",
+  appId: "1:818601011414:web:82560042731e5300974177",
+  measurementId: "G-NMHKJYGHJZ"
+};
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+
 const isAdmin = session && session.role === 'admin';
 const SUBMIT_URL = '/api/approve';
 const USERS_URL = '/api/users';
@@ -798,18 +813,6 @@ function removeAttachedFile() {
   document.getElementById('fileError').classList.add('hidden');
 }
 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result.split(',')[1];
-      resolve(base64);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 // ── FORM SUBMISSION ──────────────────────────────────────────────────────────
 async function submitForm() {
   const btn = document.getElementById('submitBtn');
@@ -860,20 +863,12 @@ async function submitForm() {
   if (selectedFile) {
     btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> UPLOADING FILE...`;
     try {
-      const base64 = await fileToBase64(selectedFile);
-      const uploadResult = await safeFetchJson('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ file: base64, fileName: selectedFile.name, mimeType: selectedFile.type }),
-      });
-      if (uploadResult.success) {
-        formData.attached_files = uploadResult.fileUrl;
-      } else {
-        showToast('error', 'File upload failed: ' + (uploadResult.error || 'Unknown error'));
-        btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_upload</span> SUBMIT FOR APPROVAL`;
-        btn.disabled = false;
-        return;
-      }
+      const ts = Date.now();
+      const safeName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const uploadName = `attachments/${ts}_${safeName}`;
+      const snapshot = await storage.ref().child(uploadName).put(selectedFile);
+      const downloadUrl = await snapshot.ref.getDownloadURL();
+      formData.attached_files = downloadUrl;
     } catch (e) {
       showToast('error', 'File upload failed: ' + (e.message || 'Network error'));
       btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_upload</span> SUBMIT FOR APPROVAL`;
