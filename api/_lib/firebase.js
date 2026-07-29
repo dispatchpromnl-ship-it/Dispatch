@@ -22,7 +22,7 @@ function getFirebaseApp() {
   }
 
   app = admin.initializeApp({
-    credential: admin.credential.cert(credentials),
+    credential: admin.cert(credentials),
     storageBucket: 'agx-dispatch.firebasestorage.app',
   });
 
