@@ -370,8 +370,8 @@ app.post('/api/upload', requireAuth, (req, res) => {
   }
   const ts = Date.now();
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const fileUrl = `https://storage.googleapis.com/agx-dispatch.firebasestorage.app/${encodeURIComponent(ts + '_' + safeName)}`;
-  console.log(`[Local Upload] ${safeName} (${(buffer.length / 1024).toFixed(0)}KB) → mock Firebase URL`);
+  const fileUrl = `https://drive.google.com/file/d/${ts}_${safeName}/view`;
+  console.log(`[Local Upload] ${safeName} (${(buffer.length / 1024).toFixed(0)}KB) → mock URL`);
   return res.status(200).json({ success: true, fileId: `${ts}_${safeName}`, fileUrl, fileName: safeName });
 });
 
