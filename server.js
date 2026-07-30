@@ -375,9 +375,39 @@ app.post('/api/upload', requireAuth, (req, res) => {
   return res.status(200).json({ success: true, fileId: `${ts}_${safeName}`, fileUrl, fileName: safeName });
 });
 
-// ── Deprecated /api/submit ────────────────────────────────────────────────────
-app.all('/api/submit', (req, res) => {
-  res.status(410).json({ success: false, error: 'Deprecated. Please refresh your browser.' });
+// ── POST /api/cleanup ─────────────────────────────────────────────────────────
+app.post('/api/cleanup', requireAuth, requireAdmin, (req, res) => {
+  const results = {};
+
+  const cleanSheet = (sheetName, sheetData) => {
+    if (sheetData.length <= 1) return { before: 0, after: 0, removed: 0 };
+    const header = sheetData[0];
+    const jobIdCol = header.indexOf('JOB ID');
+    if (jobIdCol === -1) return { error: 'JOB ID column not found' };
+
+    const dataRows = sheetData.slice(1);
+    const before = dataRows.length;
+    const seen = new Set();
+    const unique = dataRows.filter(row => {
+      const jobId = (row[jobIdCol] || '').trim().toUpperCase();
+      if (jobId && seen.has(jobId)) return false;
+      if (jobId) seen.add(jobId);
+      return true;
+    });
+    const removed = before - unique.length;
+    return { newSheet: [header, ...unique], stats: { before, after: unique.length, removed } };
+  };
+
+  const pendingClean = cleanSheet('PENDING', PENDING_SHEET);
+  if (pendingClean.newSheet) PENDING_SHEET = pendingClean.newSheet;
+  results['PENDING'] = pendingClean.stats || pendingClean;
+
+  const dbClean = cleanSheet('DATABASE', DATABASE_SHEET);
+  if (dbClean.newSheet) DATABASE_SHEET = dbClean.newSheet;
+  results['DATABASE'] = dbClean.stats || dbClean;
+
+  addAuditLog('CLEANUP_PERFORMED', req.authUser.username, `Removed duplicate rows from local sheets`);
+  return res.status(200).json({ success: true, results });
 });
 
 // ── Catch-all: serve index.html (SPA fallback) ────────────────────────────────

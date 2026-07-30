@@ -8,6 +8,11 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'GET only' });
 
+  const requestingUser = req.headers['x-username'];
+  if (!requestingUser) {
+    return res.status(401).json({ success: false, error: 'Authentication required. Send x-username header.' });
+  }
+
   const report = { checks: [] };
 
   // 1. Check GOOGLE_CREDENTIALS

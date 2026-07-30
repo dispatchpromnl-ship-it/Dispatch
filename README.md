@@ -28,7 +28,7 @@ Enterprise logistics payment request and approval system built on Vercel + Googl
 │   ├── cleanup.js          # POST — remove duplicate rows from sheets
 │   ├── login.js            # POST — user authentication
 │   ├── setup.js            # POST — first-time Google Sheets setup
-│   ├── submit.js           # deprecated (returns 410)
+│   ├── upload.js           # POST — file upload handler
 │   └── users.js            # GET/POST/PUT — user management
 ├── public/
 │   ├── agx-logo.png

@@ -84,7 +84,9 @@ module.exports = async function handler(req, res) {
         requestBody: { values: [row] },
       });
 
-      await writeAuditLog(sheets, 'USER_CREATED', 'admin',
+      const actingUser = req.headers['x-username'] || 'admin';
+
+      await writeAuditLog(sheets, 'USER_CREATED', actingUser,
         `Created user ${username.toUpperCase()} (${role || 'user'})`,
         username.toUpperCase()
       );
@@ -145,7 +147,8 @@ module.exports = async function handler(req, res) {
         active !== undefined && `status → ${active.toUpperCase()}`,
       ].filter(Boolean);
 
-      await writeAuditLog(sheets, 'USER_UPDATED', 'admin', changes.join(', ') || 'updated', newUsername);
+      const actingUser = req.headers['x-username'] || 'admin';
+      await writeAuditLog(sheets, 'USER_UPDATED', actingUser, changes.join(', ') || 'updated', newUsername);
 
       return res.status(200).json({ success: true, message: 'User updated.' });
     }
