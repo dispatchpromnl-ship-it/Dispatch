@@ -1,7 +1,37 @@
-const { getSheetsClient }  = require('./_lib/sheets');
-const { cors }             = require('./_lib/cors');
-const { verifyPassword }    = require('./_lib/hash');
-const { SPREADSHEET_ID, SHEET } = require('./_lib/constants');
+const { getSheetsClient }              = require('./_lib/sheets');
+const { cors }                         = require('./_lib/cors');
+const { verifyPassword }               = require('./_lib/hash');
+const { SPREADSHEET_ID, SHEET }        = require('./_lib/constants');
+
+// ── In-memory rate limiter (per IP, resets on cold-start) ────────────────────
+const loginAttempts = new Map(); // ip → { count, resetAt }
+const MAX_ATTEMPTS  = 10;        // max failures before lockout
+const WINDOW_MS     = 15 * 60 * 1000; // 15-minute window
+
+function checkRateLimit(ip) {
+  const now  = Date.now();
+  const entry = loginAttempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    loginAttempts.set(ip, { count: 0, resetAt: now + WINDOW_MS });
+    return { blocked: false };
+  }
+  if (entry.count >= MAX_ATTEMPTS) {
+    const waitSec = Math.ceil((entry.resetAt - now) / 1000);
+    return { blocked: true, waitSec };
+  }
+  return { blocked: false };
+}
+
+function recordFailure(ip) {
+  const now  = Date.now();
+  const entry = loginAttempts.get(ip) || { count: 0, resetAt: now + WINDOW_MS };
+  entry.count += 1;
+  loginAttempts.set(ip, entry);
+}
+
+function clearAttempts(ip) {
+  loginAttempts.delete(ip);
+}
 
 module.exports = async function handler(req, res) {
   cors(res, 'POST, OPTIONS');
@@ -11,12 +41,29 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
-    const sheets = getSheetsClient();
+    // ── Rate limiting ────────────────────────────────────────────────────
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    const rl = checkRateLimit(ip);
+    if (rl.blocked) {
+      return res.status(429).json({
+        success: false,
+        error: `Too many failed login attempts. Please wait ${Math.ceil(rl.waitSec / 60)} minute(s) before trying again.`,
+      });
+    }
 
+    // ── Input validation ─────────────────────────────────────────────────
     const { username, password } = req.body || {};
     if (!username || !password) {
       return res.status(400).json({ success: false, error: 'Username and password required.' });
     }
+    if (typeof username !== 'string' || username.length > 64) {
+      return res.status(400).json({ success: false, error: 'Invalid username.' });
+    }
+    if (typeof password !== 'string' || password.length > 128) {
+      return res.status(400).json({ success: false, error: 'Invalid password.' });
+    }
+
+    const sheets = getSheetsClient();
 
     let response;
     try {
@@ -31,11 +78,10 @@ module.exports = async function handler(req, res) {
 
     const rows = response.data.values || [];
     if (rows.length <= 1) {
-      console.warn('[login.js] USERS sheet is empty or has no user rows. Run /api/setup with SETUP_SECRET to create accounts.');
+      console.warn('[login.js] USERS sheet is empty or has no user rows.');
       return res.status(401).json({ success: false, error: 'No users found. Run setup first or contact admin.' });
     }
 
-    // Build user objects from headers
     const headers = rows[0];
     const users = rows.slice(1).map(row => {
       const user = {};
@@ -43,16 +89,17 @@ module.exports = async function handler(req, res) {
       return user;
     });
 
-    console.log(`[login.js] Login attempt for "${username}" — ${users.length} user(s) in sheet`);
-
     const user = users.find(u =>
       u['USERNAME'] && u['USERNAME'].toLowerCase() === username.toLowerCase()
     );
 
-    if (!user) {
-      console.warn(`[login.js] No matching user for "${username}"`);
+    // Use generic message for all auth failures to prevent user enumeration
+    const authFail = () => {
+      recordFailure(ip);
       return res.status(401).json({ success: false, error: 'Invalid username or password.' });
-    }
+    };
+
+    if (!user) return authFail();
 
     if (user['ACTIVE'] && user['ACTIVE'].toUpperCase() !== 'YES') {
       return res.status(401).json({ success: false, error: 'Account is deactivated. Contact admin.' });
@@ -60,14 +107,15 @@ module.exports = async function handler(req, res) {
 
     const storedHash = user['PASSWORD'];
     if (!storedHash) {
-      console.error(`[login.js] User "${username}" has no password hash in sheet.`);
+      console.error(`[login.js] User "${username}" has no password hash.`);
       return res.status(500).json({ success: false, error: 'Account data corrupted. Re-run setup.' });
     }
 
-    if (!verifyPassword(password, storedHash)) {
-      console.warn(`[login.js] Password mismatch for "${username}" — stored hash starts with: ${storedHash.substring(0, 7)}`);
-      return res.status(401).json({ success: false, error: 'Invalid username or password.' });
-    }
+    if (!verifyPassword(password, storedHash)) return authFail();
+
+    // Success — clear failure counter
+    clearAttempts(ip);
+    console.log(`[login.js] Successful login: "${user['USERNAME']}"`);
 
     return res.status(200).json({
       success:     true,

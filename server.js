@@ -5,8 +5,8 @@
 const express = require('express');
 const path    = require('path');
 
-const { hashPassword, verifyPassword }        = require('./api/_lib/hash');
-const { PENDING_COLUMNS, DB_COLUMNS, KEY_MAP } = require('./api/_lib/constants');
+const { hashPassword, verifyPassword }                           = require('./api/_lib/hash');
+const { PENDING_COLUMNS, DB_COLUMNS, KEY_MAP, ALLOWED_MIME_TYPES } = require('./api/_lib/constants');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -55,11 +55,6 @@ function addAuditLog(action, user, details = '', target = '') {
   console.log(`[AUDIT] ${action} | ${user} | ${details} ${target ? '→ ' + target : ''}`);
 }
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
 // ── Auth helpers ──────────────────────────────────────────────────────────────
 function findUser(username) {
   return rowsToObjects(USERS_SHEET).find(u => u['USERNAME'].toLowerCase() === username.toLowerCase());
@@ -88,6 +83,31 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+// ── In-memory rate limiter (login endpoint) ──────────────────────────────────
+const loginAttempts = new Map();
+const MAX_ATTEMPTS  = 10;
+const WINDOW_MS     = 15 * 60 * 1000;
+
+function checkRateLimit(ip) {
+  const now   = Date.now();
+  const entry = loginAttempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    loginAttempts.set(ip, { count: 0, resetAt: now + WINDOW_MS });
+    return { blocked: false };
+  }
+  if (entry.count >= MAX_ATTEMPTS) {
+    return { blocked: true, waitSec: Math.ceil((entry.resetAt - now) / 1000) };
+  }
+  return { blocked: false };
+}
+function recordFailure(ip) {
+  const now   = Date.now();
+  const entry = loginAttempts.get(ip) || { count: 0, resetAt: now + WINDOW_MS };
+  entry.count += 1;
+  loginAttempts.set(ip, entry);
+}
+function clearAttempts(ip) { loginAttempts.delete(ip); }
+
 // ── OPTIONS catch-all for API routes ─────────────────────────────────────────
 app.options('/api/*', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -98,23 +118,36 @@ app.options('/api/*', (req, res) => {
 
 // ── POST /api/login ───────────────────────────────────────────────────────────
 app.post('/api/login', (req, res) => {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+  const rl = checkRateLimit(ip);
+  if (rl.blocked) {
+    return res.status(429).json({
+      success: false,
+      error: `Too many failed login attempts. Please wait ${Math.ceil(rl.waitSec / 60)} minute(s) before trying again.`,
+    });
+  }
+
   const { username, password } = req.body || {};
   if (!username || !password) {
     return res.status(400).json({ success: false, error: 'Username and password required.' });
   }
+  if (typeof username !== 'string' || username.length > 64) {
+    return res.status(400).json({ success: false, error: 'Invalid username.' });
+  }
+  if (typeof password !== 'string' || password.length > 128) {
+    return res.status(400).json({ success: false, error: 'Invalid password.' });
+  }
 
   const user = findUser(username);
+  const authFail = () => { recordFailure(ip); return res.status(401).json({ success: false, error: 'Invalid username or password.' }); };
 
-  if (!user) {
-    return res.status(401).json({ success: false, error: 'Invalid username or password.' });
-  }
+  if (!user) return authFail();
   if (user['ACTIVE'].toUpperCase() !== 'YES') {
     return res.status(401).json({ success: false, error: 'Account is deactivated.' });
   }
-  if (!verifyPassword(password, user['PASSWORD'])) {
-    return res.status(401).json({ success: false, error: 'Invalid username or password.' });
-  }
+  if (!verifyPassword(password, user['PASSWORD'])) return authFail();
 
+  clearAttempts(ip);
   return res.status(200).json({
     success:     true,
     username:    user['USERNAME'],
@@ -224,7 +257,7 @@ app.get('/api/approve', requireAuth, (req, res) => {
     accountNo:       r['ACCOUNT NO.']     || '',
     bankName:        r['BANK NAME']       || '',
     totalAmount:     r['TOTAL AMOUNT']    || '',
-    paymentStatus:   r['INVOICE DUE DATE']  || '',
+    paymentStatus:   r['INVOICE DUE DATE']|| '',
     timestamp:       r['TIMESTAMP']       || '',
     submittedBy:     r['SUBMITTED BY']    || '',
     status:          r['STATUS']          || 'PENDING',
@@ -243,8 +276,10 @@ app.post('/api/approve', requireAuth, (req, res) => {
   const jobId       = (data.job_id || '').trim().toUpperCase();
 
   if (jobId) {
-    const pendingIds = PENDING_SHEET.slice(1).map(r => (r[1] || '').trim().toUpperCase());
-    const dbIds      = DATABASE_SHEET.slice(1).map(r => (r[1] || '').trim().toUpperCase());
+    const jobIdIdx   = PENDING_COLUMNS.indexOf('JOB ID');
+    const pendingIds = PENDING_SHEET.slice(1).map(r => (r[jobIdIdx] || '').trim().toUpperCase());
+    const dbIdIdx    = DB_COLUMNS.indexOf('JOB ID');
+    const dbIds      = DATABASE_SHEET.slice(1).map(r => (r[dbIdIdx] || '').trim().toUpperCase());
     if (pendingIds.includes(jobId) || dbIds.includes(jobId)) {
       return res.status(409).json({
         success: false,
@@ -254,11 +289,11 @@ app.post('/api/approve', requireAuth, (req, res) => {
   }
 
   const row = PENDING_COLUMNS.map(col => {
-    if (col === 'SUBMITTED BY')  return submittedBy;
-    if (col === 'STATUS')        return 'PENDING';
-    if (col === 'ADMIN_REMARKS') return '';
-    if (col === 'REVIEWED_BY')   return '';
-    if (col === 'REVIEWED_AT')   return '';
+    if (col === 'SUBMITTED BY')   return submittedBy;
+    if (col === 'STATUS')         return 'PENDING';
+    if (col === 'ADMIN_REMARKS')  return '';
+    if (col === 'REVIEWED_BY')    return '';
+    if (col === 'REVIEWED_AT')    return '';
     if (col === 'ATTACHED FILES') return data.attached_files || '';
     const key = Object.keys(KEY_MAP).find(k => KEY_MAP[k] === col);
     const val = (key && data[key] !== undefined) ? String(data[key]) : '';
@@ -266,6 +301,7 @@ app.post('/api/approve', requireAuth, (req, res) => {
   });
 
   PENDING_SHEET.push(row);
+
   addAuditLog('REQUEST_SUBMITTED', submittedBy,
     `Job ID: ${jobId || 'N/A'} | ${data.particulars || ''} | ₱${data.amount_2 || '0'}`,
     `Row ${PENDING_SHEET.length - 1}`
@@ -291,10 +327,19 @@ app.put('/api/approve', requireAuth, requireAdmin, (req, res) => {
   const reviewer = reviewedBy || req.authUser.username;
   const ts       = localTimestamp();
 
-  rowData[15] = action === 'approve' ? 'APPROVED' : 'REJECTED';
-  rowData[16] = remarks  || '';
-  rowData[17] = reviewer;
-  rowData[18] = ts;
+  // Use named column lookups — safe if PENDING_COLUMNS order ever changes
+  const statusIdx     = PENDING_COLUMNS.indexOf('STATUS');
+  const remarksIdx    = PENDING_COLUMNS.indexOf('ADMIN_REMARKS');
+  const reviewedByIdx = PENDING_COLUMNS.indexOf('REVIEWED_BY');
+  const reviewedAtIdx = PENDING_COLUMNS.indexOf('REVIEWED_AT');
+  const jobIdIdx      = PENDING_COLUMNS.indexOf('JOB ID');
+  const partIdx       = PENDING_COLUMNS.indexOf('PARTICULARS');
+  const amtIdx        = PENDING_COLUMNS.indexOf('TOTAL AMOUNT');
+
+  rowData[statusIdx]     = action === 'approve' ? 'APPROVED' : 'REJECTED';
+  rowData[remarksIdx]    = remarks || '';
+  rowData[reviewedByIdx] = reviewer;
+  rowData[reviewedAtIdx] = ts;
 
   if (action === 'approve') {
     const dbRow = DB_COLUMNS.map(col => {
@@ -303,10 +348,15 @@ app.put('/api/approve', requireAuth, requireAdmin, (req, res) => {
     });
     DATABASE_SHEET.push(dbRow);
     addAuditLog('REQUEST_APPROVED', reviewer,
-      `Job ID: ${rowData[1]} | ${rowData[2]} | ₱${rowData[11] || '0'}`, `Row ${row}`);
+      `Job ID: ${rowData[jobIdIdx]} | ${rowData[partIdx]} | ₱${rowData[amtIdx] || '0'}`,
+      `Row ${row}`
+    );
     console.log(`[Local] Request approved. DB rows: ${DATABASE_SHEET.length - 1}`);
   } else {
-    addAuditLog('REQUEST_REJECTED', reviewer, `Job ID: ${rowData[1]} | Reason: ${remarks}`, `Row ${row}`);
+    addAuditLog('REQUEST_REJECTED', reviewer,
+      `Job ID: ${rowData[jobIdIdx]} | Reason: ${remarks}`,
+      `Row ${row}`
+    );
     console.log('[Local] Request rejected.');
   }
 
@@ -320,8 +370,10 @@ app.put('/api/approve', requireAuth, requireAdmin, (req, res) => {
 
 // ── GET /api/check-job-id ─────────────────────────────────────────────────────
 app.get('/api/check-job-id', requireAuth, (req, res) => {
-  const pendingIds = PENDING_SHEET.slice(1).map(r => (r[1] || '').trim().toUpperCase()).filter(Boolean);
-  const dbIds      = DATABASE_SHEET.slice(1).map(r => (r[1] || '').trim().toUpperCase()).filter(Boolean);
+  const jobIdIdx   = PENDING_COLUMNS.indexOf('JOB ID');
+  const dbJobIdIdx = DB_COLUMNS.indexOf('JOB ID');
+  const pendingIds = PENDING_SHEET.slice(1).map(r => (r[jobIdIdx] || '').trim().toUpperCase()).filter(Boolean);
+  const dbIds      = DATABASE_SHEET.slice(1).map(r => (r[dbJobIdIdx] || '').trim().toUpperCase()).filter(Boolean);
   const allIds     = [...new Set([...pendingIds, ...dbIds])];
   return res.json({ success: true, pendingIds, dbIds, allIds });
 });
@@ -343,34 +395,23 @@ app.get('/api/audit', requireAuth, requireAdmin, (req, res) => {
   return res.status(200).json({ success: true, logs });
 });
 
-// ── POST /api/audit ───────────────────────────────────────────────────────────
-app.post('/api/audit', requireAuth, requireAdmin, (req, res) => {
-  const { action, details, target } = req.body || {};
-  if (!action) {
-    return res.status(400).json({ success: false, error: 'Action required.' });
-  }
-  addAuditLog(action, req.authUser.username, details, target);
-  return res.status(200).json({ success: true, message: 'Audit log recorded.' });
-});
-
 // ── POST /api/upload (local dev mock) ────────────────────────────────────────
 app.post('/api/upload', requireAuth, (req, res) => {
   const { file, fileName, mimeType } = req.body || {};
   if (!file || !fileName) {
     return res.status(400).json({ success: false, error: 'File data and fileName required.' });
   }
-  const ALLOWED = ['application/pdf', 'image/jpeg', 'image/png', 'image/heic', 'image/heif', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
-  if (!ALLOWED.includes(mimeType)) {
+  if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
     return res.status(400).json({ success: false, error: `File type "${mimeType}" not allowed. Allowed: PDF, JPG, PNG, HEIC, DOC, DOCX, XLS, XLSX.` });
   }
   const buffer = Buffer.from(file, 'base64');
-  const MAX = 3 * 1024 * 1024;
-  if (buffer.length > MAX) {
+  const MAX_BYTES = 3 * 1024 * 1024;
+  if (buffer.length > MAX_BYTES) {
     return res.status(400).json({ success: false, error: `File size (${(buffer.length / 1024 / 1024).toFixed(1)}MB) exceeds 3MB limit.` });
   }
-  const ts = Date.now();
+  const ts       = Date.now();
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const fileUrl = `https://drive.google.com/file/d/${ts}_${safeName}/view`;
+  const fileUrl  = `https://drive.google.com/file/d/${ts}_${safeName}/view`;
   console.log(`[Local Upload] ${safeName} (${(buffer.length / 1024).toFixed(0)}KB) → mock URL`);
   return res.status(200).json({ success: true, fileId: `${ts}_${safeName}`, fileUrl, fileName: safeName });
 });
@@ -381,21 +422,20 @@ app.post('/api/cleanup', requireAuth, requireAdmin, (req, res) => {
 
   const cleanSheet = (sheetName, sheetData) => {
     if (sheetData.length <= 1) return { before: 0, after: 0, removed: 0 };
-    const header = sheetData[0];
+    const header   = sheetData[0];
     const jobIdCol = header.indexOf('JOB ID');
     if (jobIdCol === -1) return { error: 'JOB ID column not found' };
 
     const dataRows = sheetData.slice(1);
-    const before = dataRows.length;
-    const seen = new Set();
-    const unique = dataRows.filter(row => {
+    const before   = dataRows.length;
+    const seen     = new Set();
+    const unique   = dataRows.filter(row => {
       const jobId = (row[jobIdCol] || '').trim().toUpperCase();
       if (jobId && seen.has(jobId)) return false;
       if (jobId) seen.add(jobId);
       return true;
     });
-    const removed = before - unique.length;
-    return { newSheet: [header, ...unique], stats: { before, after: unique.length, removed } };
+    return { newSheet: [header, ...unique], stats: { before, after: unique.length, removed: before - unique.length } };
   };
 
   const pendingClean = cleanSheet('PENDING', PENDING_SHEET);
@@ -406,7 +446,7 @@ app.post('/api/cleanup', requireAuth, requireAdmin, (req, res) => {
   if (dbClean.newSheet) DATABASE_SHEET = dbClean.newSheet;
   results['DATABASE'] = dbClean.stats || dbClean;
 
-  addAuditLog('CLEANUP_PERFORMED', req.authUser.username, `Removed duplicate rows from local sheets`);
+  addAuditLog('CLEANUP_PERFORMED', req.authUser.username, 'Removed duplicate rows from local sheets');
   return res.status(200).json({ success: true, results });
 });
 

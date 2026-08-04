@@ -1,6 +1,7 @@
 const { getSheetsClient, ensureHeaders } = require('./_lib/sheets');
 const { cors }                           = require('./_lib/cors');
 const { writeAuditLog }                  = require('./_lib/audit');
+const { verifyUser, verifyAdmin }        = require('./_lib/auth');
 const {
   SPREADSHEET_ID, SHEET,
   PENDING_COLUMNS, DB_COLUMNS, KEY_MAP,
@@ -13,10 +14,14 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const sheets = getSheetsClient();
+    const sheets   = getSheetsClient();
+    const username = req.headers['x-username'];
 
-    // ── GET: List all requests from PENDING ──────────────────────────────
+    // ── GET: any authenticated user can read pending list ────────────────
     if (req.method === 'GET') {
+      const auth = await verifyUser(sheets, username);
+      if (!auth.ok) return res.status(auth.status).json({ success: false, error: auth.error });
+
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
         range: `${SHEET.PENDING}!A1:T`,
@@ -25,7 +30,7 @@ module.exports = async function handler(req, res) {
       const rows = response.data.values || [];
       if (rows.length <= 1) return res.status(200).json({ success: true, requests: [] });
 
-      const headers = rows[0];
+      const headers  = rows[0];
       const requests = rows.slice(1).map((row, idx) => {
         const r = { _row: idx + 2 };
         headers.forEach((h, i) => { r[h] = row[i] || ''; });
@@ -35,38 +40,45 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({
         success: true,
         requests: requests.map(r => ({
-          row:            r._row,
-          dateRequested:  r['DATE REQUESTED']  || '',
-          jobId:          r['JOB ID']           || '',
-          particulars:    r['PARTICULARS']      || '',
-          consignee:      r['CONSIGNEE']        || '',
-          mbl:            r['MBL']              || '',
-          hbl:            r['HBL']              || '',
-          containerNumber: r['CONTAINER NUMBER'] || '',
-          requestedBy:    r['REQUESTED BY']     || '',
-          supplierName:   r["SUPPLIER'S NAME"]  || '',
-          accountNo:      r['ACCOUNT NO.']      || '',
-          bankName:       r['BANK NAME']        || '',
-          totalAmount:    r['TOTAL AMOUNT']     || '',
-          paymentStatus:  r['INVOICE DUE DATE']   || '',
-          timestamp:      r['TIMESTAMP']        || '',
-          submittedBy:    r['SUBMITTED BY']     || '',
-          status:         r['STATUS']           || 'PENDING',
-          adminRemarks:   r['ADMIN_REMARKS']    || '',
-          reviewedBy:     r['REVIEWED_BY']      || '',
-          reviewedAt:     r['REVIEWED_AT']      || '',
-          attachedFiles:  r['ATTACHED FILES']   || '',
+          row:             r._row,
+          dateRequested:   r['DATE REQUESTED']   || '',
+          jobId:           r['JOB ID']            || '',
+          particulars:     r['PARTICULARS']       || '',
+          consignee:       r['CONSIGNEE']         || '',
+          mbl:             r['MBL']               || '',
+          hbl:             r['HBL']               || '',
+          containerNumber: r['CONTAINER NUMBER']  || '',
+          requestedBy:     r['REQUESTED BY']      || '',
+          supplierName:    r["SUPPLIER'S NAME"]   || '',
+          accountNo:       r['ACCOUNT NO.']       || '',
+          bankName:        r['BANK NAME']         || '',
+          totalAmount:     r['TOTAL AMOUNT']      || '',
+          paymentStatus:   r['INVOICE DUE DATE']  || '',
+          timestamp:       r['TIMESTAMP']         || '',
+          submittedBy:     r['SUBMITTED BY']      || '',
+          status:          r['STATUS']            || 'PENDING',
+          adminRemarks:    r['ADMIN_REMARKS']     || '',
+          reviewedBy:      r['REVIEWED_BY']       || '',
+          reviewedAt:      r['REVIEWED_AT']       || '',
+          attachedFiles:   r['ATTACHED FILES']    || '',
         })),
       });
     }
 
-    // ── POST: Submit new request to PENDING ──────────────────────────────
+    // ── POST: any authenticated user can submit a request ────────────────
     if (req.method === 'POST') {
+      const auth = await verifyUser(sheets, username);
+      if (!auth.ok) return res.status(auth.status).json({ success: false, error: auth.error });
+
       const data        = req.body || {};
-      const submittedBy = data.submitted_by || 'unknown';
+      const submittedBy = auth.user.username; // always from verified session
       const jobId       = (data.job_id || '').trim();
 
-      // Duplicate Job ID check across PENDING and DATABASE
+      // Input length guards
+      if (jobId.length > 100) {
+        return res.status(400).json({ success: false, error: 'Job ID too long.' });
+      }
+
       if (jobId) {
         const [pendingRes, dbRes] = await Promise.allSettled([
           sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${SHEET.PENDING}!B:B` }),
@@ -88,11 +100,11 @@ module.exports = async function handler(req, res) {
       }
 
       const row = PENDING_COLUMNS.map(col => {
-        if (col === 'SUBMITTED BY')  return submittedBy;
-        if (col === 'STATUS')        return 'PENDING';
-        if (col === 'ADMIN_REMARKS') return '';
-        if (col === 'REVIEWED_BY')   return '';
-        if (col === 'REVIEWED_AT')   return '';
+        if (col === 'SUBMITTED BY')   return submittedBy;
+        if (col === 'STATUS')         return 'PENDING';
+        if (col === 'ADMIN_REMARKS')  return '';
+        if (col === 'REVIEWED_BY')    return '';
+        if (col === 'REVIEWED_AT')    return '';
         if (col === 'ATTACHED FILES') return data.attached_files || '';
         const key = Object.keys(KEY_MAP).find(k => KEY_MAP[k] === col);
         const val = (key && data[key] !== undefined) ? String(data[key]) : '';
@@ -115,11 +127,17 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Request submitted for approval.' });
     }
 
-    // ── PUT: Approve or reject a pending request ──────────────────────────
+    // ── PUT: only admin can approve / reject ─────────────────────────────
     if (req.method === 'PUT') {
+      const auth = await verifyAdmin(sheets, username);
+      if (!auth.ok) return res.status(auth.status).json({ success: false, error: auth.error });
+
       const { row, action, remarks, reviewedBy } = req.body || {};
       if (!row || !action) {
         return res.status(400).json({ success: false, error: 'Row and action required.' });
+      }
+      if (!['approve', 'reject'].includes(action)) {
+        return res.status(400).json({ success: false, error: 'Action must be "approve" or "reject".' });
       }
 
       const current = await sheets.spreadsheets.values.get({
@@ -130,14 +148,22 @@ module.exports = async function handler(req, res) {
         return res.status(404).json({ success: false, error: 'Request not found.' });
       }
 
-      const rowData = current.data.values[0];
-      const now     = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' });
-      const reviewer = reviewedBy || 'admin';
+      const rowData  = current.data.values[0];
+      const now      = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' });
+      const reviewer = reviewedBy || auth.user.username;
 
-      rowData[15] = action === 'approve' ? 'APPROVED' : 'REJECTED';
-      rowData[16] = remarks  || '';
-      rowData[17] = reviewer;
-      rowData[18] = now;
+      const statusIdx     = PENDING_COLUMNS.indexOf('STATUS');
+      const remarksIdx    = PENDING_COLUMNS.indexOf('ADMIN_REMARKS');
+      const reviewedByIdx = PENDING_COLUMNS.indexOf('REVIEWED_BY');
+      const reviewedAtIdx = PENDING_COLUMNS.indexOf('REVIEWED_AT');
+      const jobIdIdx      = PENDING_COLUMNS.indexOf('JOB ID');
+      const partIdx       = PENDING_COLUMNS.indexOf('PARTICULARS');
+      const amtIdx        = PENDING_COLUMNS.indexOf('TOTAL AMOUNT');
+
+      rowData[statusIdx]     = action === 'approve' ? 'APPROVED' : 'REJECTED';
+      rowData[remarksIdx]    = remarks || '';
+      rowData[reviewedByIdx] = reviewer;
+      rowData[reviewedAtIdx] = now;
 
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
@@ -147,14 +173,9 @@ module.exports = async function handler(req, res) {
       });
 
       if (action === 'approve') {
-        // Copy approved row to DATABASE using DB_COLUMNS
         const dbRow = DB_COLUMNS.map(col => {
-          const key = Object.keys(KEY_MAP).find(k => KEY_MAP[k] === col);
-          if (key) {
-            const idx = PENDING_COLUMNS.indexOf(KEY_MAP[key]);
-            return idx >= 0 ? rowData[idx] || '' : '';
-          }
-          return '';
+          const srcIdx = PENDING_COLUMNS.indexOf(col);
+          return srcIdx >= 0 ? rowData[srcIdx] || '' : '';
         });
 
         await ensureHeaders(sheets, SPREADSHEET_ID, SHEET.DATABASE, DB_COLUMNS);
@@ -167,13 +188,13 @@ module.exports = async function handler(req, res) {
 
         await writeAuditLog(
           sheets, 'REQUEST_APPROVED', reviewer,
-          `Job ID: ${rowData[1]} | ${rowData[2]} | ₱${rowData[11] || '0'}`,
+          `Job ID: ${rowData[jobIdIdx]} | ${rowData[partIdx]} | ₱${rowData[amtIdx] || '0'}`,
           `Row ${row}`
         );
       } else {
         await writeAuditLog(
           sheets, 'REQUEST_REJECTED', reviewer,
-          `Job ID: ${rowData[1]} | Reason: ${remarks}`,
+          `Job ID: ${rowData[jobIdIdx]} | Reason: ${remarks}`,
           `Row ${row}`
         );
       }

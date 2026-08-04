@@ -1,4 +1,5 @@
-const { getDriveClient, GOOGLE_DRIVE_FOLDER_ID, MAX_FILE_SIZE_BYTES, ALLOWED_MIME_TYPES } = require('./_lib/sheets');
+const { getDriveClient }                                                  = require('./_lib/sheets');
+const { GOOGLE_DRIVE_FOLDER_ID, MAX_FILE_SIZE_BYTES, ALLOWED_MIME_TYPES } = require('./_lib/constants');
 const { cors } = require('./_lib/cors');
 
 module.exports = async function handler(req, res) {

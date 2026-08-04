@@ -1,20 +1,6 @@
 // ── Google Sheets & Drive auth & client factory ─────────────────────────────
 const { google } = require('googleapis');
 
-const GOOGLE_DRIVE_FOLDER_ID = '1BfH5MpVB9ace6bFsyosvNbOwFpm5JIcL';
-const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024; // 3MB (base64 inflates ~33%, stays under Vercel 4.5MB limit)
-const ALLOWED_MIME_TYPES = [
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'image/heic',
-  'image/heif',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-];
-
 /**
  * Parses GOOGLE_CREDENTIALS env var.
  * @returns {object} Parsed credentials
@@ -117,7 +103,4 @@ async function ensureHeaders(sheets, spreadsheetId, sheetName, headers) {
   }
 }
 
-module.exports = {
-  getSheetsClient, getDriveClient, ensureHeaders,
-  GOOGLE_DRIVE_FOLDER_ID, MAX_FILE_SIZE_BYTES, ALLOWED_MIME_TYPES,
-};
+module.exports = { getSheetsClient, getDriveClient, ensureHeaders };

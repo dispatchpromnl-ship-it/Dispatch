@@ -4,14 +4,13 @@ const { hashPassword }                   = require('./_lib/hash');
 const { AUDIT_HEADERS }                  = require('./_lib/audit');
 const {
   SPREADSHEET_ID, SHEET,
-  PENDING_COLUMNS, DB_COLUMNS,
+  USER_HEADERS, PENDING_COLUMNS, DB_COLUMNS,
 } = require('./_lib/constants');
 
 const SETUP_SECRET = process.env.SETUP_SECRET;
 if (!SETUP_SECRET) {
   console.warn('[setup.js] WARNING: SETUP_SECRET env var is not set. Setup endpoint is disabled.');
 }
-const USER_HEADERS = ['USERNAME', 'PASSWORD', 'ROLE', 'DISPLAY_NAME', 'ACTIVE', 'CREATED'];
 
 const DEFAULT_USERS = [
   ['ADMIN1', 'admin123', 'admin', 'ADMIN ONE'],

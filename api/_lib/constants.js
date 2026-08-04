@@ -9,6 +9,9 @@ const SHEET = {
   AUDIT_LOG: 'AUDIT_LOG',
 };
 
+// Column definitions for each sheet
+const USER_HEADERS = ['USERNAME', 'PASSWORD', 'ROLE', 'DISPLAY_NAME', 'ACTIVE', 'CREATED'];
+
 const PENDING_COLUMNS = [
   'DATE REQUESTED', 'JOB ID', 'PARTICULARS', 'CONSIGNEE', 'MBL', 'HBL',
   'CONTAINER NUMBER', 'REQUESTED BY', "SUPPLIER'S NAME", 'ACCOUNT NO.',
@@ -42,4 +45,23 @@ const KEY_MAP = {
   timestamp:        'TIMESTAMP',
 };
 
-module.exports = { SPREADSHEET_ID, SHEET, PENDING_COLUMNS, DB_COLUMNS, KEY_MAP };
+// Google Drive upload constraints (used by api/upload.js)
+const GOOGLE_DRIVE_FOLDER_ID = '1BfH5MpVB9ace6bFsyosvNbOwFpm5JIcL';
+const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024; // 3MB
+const ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/heic',
+  'image/heif',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+];
+
+module.exports = {
+  SPREADSHEET_ID, SHEET,
+  USER_HEADERS, PENDING_COLUMNS, DB_COLUMNS, KEY_MAP,
+  GOOGLE_DRIVE_FOLDER_ID, MAX_FILE_SIZE_BYTES, ALLOWED_MIME_TYPES,
+};
