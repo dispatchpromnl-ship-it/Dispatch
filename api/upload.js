@@ -38,6 +38,7 @@ module.exports = async function handler(req, res) {
     const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
     const uploadName = `${ts}_${safeName}`;
 
+    // Upload with supportsAllDrives=true to enable Shared Drive support
     const response = await drive.files.create({
       requestBody: {
         name: uploadName,
@@ -48,6 +49,7 @@ module.exports = async function handler(req, res) {
         body: require('stream').Readable.from(buffer),
       },
       fields: 'id, webViewLink, webContentLink',
+      supportsAllDrives: true, // Enable Shared Drives support
     });
 
     const fileId = response.data.id;
@@ -63,7 +65,26 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (err) {
-    console.error('[upload.js]', err.message);
-    return res.status(err.statusCode || 500).json({ success: false, error: err.message });
+    console.error('[upload.js] Error:', err.message);
+    
+    // Provide helpful error messages for common issues
+    if (err.message && err.message.includes('storage quota')) {
+      return res.status(500).json({
+        success: false,
+        error: 'Service account cannot upload to My Drive. Please use a Shared Drive folder. Contact admin to configure GOOGLE_DRIVE_FOLDER_ID with a Shared Drive folder ID.',
+      });
+    }
+    
+    if (err.message && err.message.includes('File not found')) {
+      return res.status(500).json({
+        success: false,
+        error: 'Drive folder not found. The GOOGLE_DRIVE_FOLDER_ID may be invalid or the service account may not have access. Contact admin.',
+      });
+    }
+
+    return res.status(err.statusCode || 500).json({
+      success: false,
+      error: err.message || 'File upload failed. Contact admin.',
+    });
   }
 };
