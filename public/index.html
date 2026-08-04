@@ -318,24 +318,20 @@ header, aside, main, div, button, input, select, textarea, a, h1, h2, p, span { 
             </div>
           </div>
 
-          <!-- Attach File Section -->
+          <!-- Attach File Section (TEMPORARILY DISABLED) -->
           <div class="pt-lg border-t border-divider">
             <div class="flex items-center gap-xs mb-2">
               <span class="material-symbols-outlined text-[14px] text-on-surface-variant">attach_file</span>
-              <label class="text-xs font-label-caps text-on-surface-variant">ATTACH FILE (OPTIONAL)</label>
+              <label class="text-xs font-label-caps text-on-surface-variant">FILE ATTACHMENTS</label>
+              <span class="ml-2 px-2 py-0.5 bg-surface-container-high text-[9px] font-bold text-on-surface-variant rounded-full border border-outline-variant">COMING SOON</span>
             </div>
-            <p class="text-[10px] text-on-surface-variant mb-2">PDF, JPG, PNG, HEIC, DOC, DOCX, XLS, XLSX — Max 3MB. For verification/validation of data entry.</p>
-            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <label class="flex-1 w-full sm:w-auto h-10 px-md form-input font-input-text text-input-text text-xs flex items-center gap-2 cursor-pointer hover:bg-surface-container-high transition-colors" id="fileLabel">
-                <span class="material-symbols-outlined text-[16px] text-on-surface-variant">upload_file</span>
-                <span id="fileLabelText" class="text-on-surface-variant truncate">No file selected</span>
-                <input type="file" id="attachedFile" accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,.doc,.docx,.xls,.xlsx,application/pdf,image/jpeg,image/png,image/heic,image/heif,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden"/>
-              </label>
-              <button type="button" id="removeFileBtn" class="hidden h-10 px-3 btn-danger-outline text-[10px] font-semibold flex items-center gap-1" onclick="removeAttachedFile()">
-                <span class="material-symbols-outlined text-[14px]">close</span> REMOVE
-              </button>
+            <div class="bg-surface-container-low border border-outline-variant rounded-lg p-4 flex items-start gap-3">
+              <span class="material-symbols-outlined text-[20px] text-on-surface-variant opacity-50">construction</span>
+              <div>
+                <p class="text-[11px] font-semibold text-on-surface mb-1">File Upload Feature Under Configuration</p>
+                <p class="text-[10px] text-on-surface-variant">The file attachment feature is temporarily unavailable while we configure secure storage. You can still submit requests without attachments.</p>
+              </div>
             </div>
-            <div id="fileError" class="hidden text-[10px] text-status-red-text bg-status-red-bg px-3 py-2 border border-status-red-bg rounded-lg mt-2"></div>
           </div>
 
           <div class="pt-xl mt-lg border-t border-divider flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
@@ -759,7 +755,10 @@ function addOperationEntry(jobId, status) {
   feed.insertBefore(div, feed.firstChild);
 }
 
-// ── FILE ATTACHMENT HANDLING ────────────────────────────────────────────────
+// ── FILE ATTACHMENT HANDLING (TEMPORARILY DISABLED - COMING SOON) ────────────
+// File upload feature disabled until Google Drive Shared Drive is configured
+// See GOOGLE_DRIVE_SETUP.md for setup instructions
+/*
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/heic', 'image/heif', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
 const ALLOWED_EXT = ['.pdf', '.jpg', '.jpeg', '.png', '.heic', '.heif', '.doc', '.docx', '.xls', '.xlsx'];
@@ -809,6 +808,7 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+*/
 
 // ── FORM SUBMISSION ──────────────────────────────────────────────────────────
 async function submitForm() {
@@ -856,6 +856,9 @@ async function submitForm() {
     console.warn('Duplicate check skipped:', e.message);
   }
 
+  // File upload temporarily disabled - skip upload step
+  // Uncomment after Google Drive Shared Drive setup (see GOOGLE_DRIVE_SETUP.md)
+  /*
   // Upload file if attached
   if (selectedFile) {
     btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> UPLOADING FILE...`;
@@ -881,6 +884,7 @@ async function submitForm() {
       return;
     }
   }
+  */
 
   btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span> SUBMITTING...`;
   try {
@@ -889,7 +893,7 @@ async function submitForm() {
       showToast('success', 'Request submitted for admin approval!');
       addOperationEntry(formData.job_id || 'REQ-NEW', 'Pending Approval');
       form.reset();
-      removeAttachedFile();
+      // removeAttachedFile(); // Disabled - file upload feature temporarily unavailable
       document.getElementById('date_requested').value = new Date().toISOString().split('T')[0];
     } else {
       showToast('error', result.error || 'Submission failed.');
